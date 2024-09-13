@@ -1,4 +1,4 @@
-# Hi there! I'm Mohammad Saleh Mahdinejad 👋
+# I'm Mohammad Saleh Mahdinejad 👋
 
 ![Coding GIF](https://media.giphy.com/media/26tn33aiTi1jkl6H6/giphy.gif)
 
@@ -18,9 +18,14 @@ Here are some of the modern technologies and tools I work with:
 I love collaborating with people and sharing knowledge. Feel free to reach out to me through any of the platforms below:
 
 <p align="left">
-  <a href="mailto:msmahdinejad@example.com"><img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
+  <a href="mailto:msmahdinejad@example.com"><img src="https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=gmail&logoColor=white" /></a>
 </p>
 
 ---
 
-![Profile Views](https://komarev.com/ghpvc/?username=yourusername&style=flat-square)
+![Profile Views](https://komarev.com/ghpvc/?username=msmahdinejad&style=flat-square)
+
+
+## 📊 Most Used Languages:
+
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=msmahdinejad&layout=compact&theme=tokyonight)
