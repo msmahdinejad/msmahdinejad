@@ -4,9 +4,9 @@
 
 ---
 
-- 🔭 I’m currently working on **Blockchain**
+- 🔭 I’m currently working on **Go, Blockchain**
 
-- 🌱 I’m currently learning **Go, Blockchain**
+- 🌱 I’m currently learning **Go, JS, Blockchain**
 
 - 🤝 I’m looking for help with **Blockchain**
 
