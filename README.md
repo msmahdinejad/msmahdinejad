@@ -25,8 +25,10 @@
 <p align="left">
   <a href="mailto:msmahdinejad@gmail.com">
   <img src="https://img.icons8.com/color/48/000000/gmail.png" alt="Gmail" width="40" height="40"/>
-  <a href="https://linkedin.com/in/msmahdineja)">
-  <img src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="Linkedin" height="30" width="40"/>
+    <a href="https://www.linkedin.com/in/msmahdinejad/">
+  <img src="https://img.icons8.com/color/48/000000/linkedin.png" alt="LinkedIn" width="40" height="40"/>
+</a>
+
 </p>
 
 ---
