@@ -1,5 +1,5 @@
 <h1 align="center">Hi 👋, I'm Saleh</h1>
-<h3 align="center">A Computer Engineering student in University of Isfahan!</h3>
+<h3 align="center">A computer engineering student at University of Isfahan!</h3>
 <img src="https://user-images.githubusercontent.com/61057666/169029838-74df663d-2e62-4d77-bdff-b43f7d63f00f.png" />
 
 ---
