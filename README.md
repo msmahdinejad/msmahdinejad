@@ -4,11 +4,9 @@
 
 ---
 
-- 🔭 I’m currently working on **Go, Blockchain**
+- 🔭 I’m currently working on **C#, Python, C++**
 
 - 🌱 I’m currently learning **Go, JS, Blockchain**
-
-- 🤝 I’m looking for help with **Blockchain**
 
 - 📫 How to reach me **msmahdinejad@gmail.com**
 
