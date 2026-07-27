@@ -1,31 +1,88 @@
-<h1 align="center">Hi 👋, I'm Saleh</h1>
-<h3 align="center">A computer engineering student at University of Isfahan!</h3>
-<img src="https://user-images.githubusercontent.com/61057666/169029838-74df663d-2e62-4d77-bdff-b43f7d63f00f.png" />
+```markdown
+<div align="center">
+
+# Hi, I'm Saleh 👋
+
+### Back-End Developer · Applied AI Enthusiast
+
+Computer Engineering student at the University of Isfahan, interested in building  
+production-ready back-end systems, real-time applications, and AI-powered products.
+
+[![Email](https://img.shields.io/badge/Email-EA4335?style=flat-square&logo=gmail&logoColor=white)](mailto:msmahdinejad@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/msmahdinejad/)
+[![Profile Views](https://komarev.com/ghpvc/?username=msmahdinejad&style=flat-square&color=35647F)](https://github.com/msmahdinejad)
+
+</div>
 
 ---
 
-- 🔭 I’m currently working on **C#, Python, C++**
+## About Me
 
-- 🌱 I’m currently learning **Go, JS, Blockchain**
-
-- 📫 How to reach me **msmahdinejad@gmail.com**
-
----
-
-## 🚀 Languages and Tools:
-<p align="left"> <a href="https://www.cprogramming.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/c/c-original.svg" alt="c" width="40" height="40"/> </a> <a href="https://www.w3schools.com/cpp/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/cplusplus/cplusplus-original.svg" alt="cplusplus" width="40" height="40"/> </a> <a href="https://www.w3schools.com/cs/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/csharp/csharp-original.svg" alt="csharp" width="40" height="40"/> </a> <a href="https://dotnet.microsoft.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/dot-net/dot-net-original-wordmark.svg" alt="dotnet" width="40" height="40"/> </a> <a href="https://www.python.org" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="40" height="40"/> </a> <a href="https://www.qt.io/" target="_blank" rel="noreferrer"> <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Qt_logo_2016.svg" alt="qt" width="40" height="40"/> </a> <a href="https://www.sqlite.org/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/sqlite/sqlite-icon.svg" alt="sqlite" width="40" height="40"/> </a> <a href="https://www.microsoft.com/en-us/sql-server" target="_blank" rel="noreferrer"> <img src="https://www.svgrepo.com/show/303229/microsoft-sql-server-logo.svg" alt="mssql" width="40" height="40"/> </a> <a href="https://www.postgresql.org" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original-wordmark.svg" alt="postgresql" width="40" height="40"/> </a> <a href="https://www.elastic.co" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/elastic/elastic-icon.svg" alt="elasticsearch" width="40" height="40"/> </a> <a href="https://www.mysql.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mysql/mysql-original-wordmark.svg" alt="mysql" width="40" height="40"/> </a> <a href="https://www.docker.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original-wordmark.svg" alt="docker" width="40" height="40"/> </a> <a href="https://git-scm.com/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40"/> </a> <a href="https://www.arduino.cc/" target="_blank" rel="noreferrer"> <img src="https://cdn.worldvectorlogo.com/logos/arduino-1.svg" alt="arduino" width="40" height="40"/> </a> <a href="https://www.linux.org/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/linux/linux-original.svg" alt="linux" width="40" height="40"/> </a>
+- Building back-end and full-stack applications with **Django**, **ASP.NET Core**, and **Node.js**
+- Interested in **software architecture**, **real-time systems**, **AI agents**, and **automated testing**
+- Experienced with **PostgreSQL**, **Redis**, **Docker**, message queues, and RESTful APIs
+- Exploring practical applications of machine learning and large language models
 
 ---
 
-## 💬 Connect with me:
+## Featured Projects
 
-<p align="left">
-  <a href="mailto:msmahdinejad@gmail.com">
-  <img src="https://img.icons8.com/color/48/000000/gmail.png" alt="Gmail" width="40" height="40"/>
-    <a href="https://www.linkedin.com/in/msmahdinejad/">
-  <img src="https://img.icons8.com/color/48/000000/linkedin.png" alt="LinkedIn" width="40" height="40"/>
-</a>
+### [AsanBimeh](https://asan-bimeh.ir)
 
+A Persian insurance comparison and decision platform that collects and normalizes
+quotes from multiple online providers.
+
+`TypeScript` `React` `Node.js` `PostgreSQL` `Redis` `BullMQ` `Playwright` `Docker` `LLM APIs`
+
+- Multi-provider quote collection and comparison
+- Explainable recommendation scoring and installment analysis
+- Persian AI assistant with text, voice, and controlled tools
+- Background workers, transactional outbox, and 376 automated tests
+
+### [TREX AI Workspace](https://trexchat.ir)
+
+A full-stack Persian AI workspace that integrates multiple AI models through a
+unified conversational interface.
+
+`Django` `DRF` `Channels` `Celery` `React` `PostgreSQL` `Redis` `Docker` `Nginx`
+
+- Real-time AI response streaming
+- Conversation, file, credit, and payment management
+- Asynchronous processing and persistent message queues
+- Production deployment, monitoring, and administration tools
+
+### AI & Machine Learning
+
+[AI Fundamentals](https://github.com/msmahdinejad/AI_Fundamentals)
+·
+[Machine Learning Assignments](https://github.com/msmahdinejad/Machine-Learning-assignments)
+
+Implementations of search algorithms, minimax, reinforcement learning, regression,
+classification, clustering, neural networks, and symbolic reasoning systems.
+
+---
+
+## Tech Stack
+
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=python,cs,cpp,java,ts,js,django,dotnet,nodejs,express,react,postgres,sqlite,redis,pytorch,docker,nginx,git,linux&perline=10" alt="Technology stack" />
 </p>
 
 ---
+
+## More Projects
+
+- [Relationship Analysis](https://github.com/Star-Academy/Summer1403-Project-Group04-Backend) — Graph-based relationship analysis API built with ASP.NET Core
+- [Smart Monitoring System](https://github.com/msmahdinejad/Smart-Monitoring-System) — ESP32-CAM monitoring with Telegram notifications and AI-assisted analysis
+- [DS Social Network](https://github.com/msmahdinejad/DS-Social-Network) — Social-network APIs and graph-based connection algorithms
+
+---
+
+<div align="center">
+
+<img height="165" src="https://github-readme-stats.vercel.app/api?username=msmahdinejad&show_icons=true&hide_border=true&theme=transparent&rank_icon=github" alt="GitHub statistics" />
+
+<img height="165" src="https://github-readme-stats.vercel.app/api/top-langs/?username=msmahdinejad&layout=compact&hide_border=true&theme=transparent&langs_count=6" alt="Most used languages" />
+
+</div>
+```
