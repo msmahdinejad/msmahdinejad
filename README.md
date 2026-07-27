@@ -1,4 +1,3 @@
-```markdown
 <div align="center">
 
 # Hi, I'm Saleh 👋
@@ -85,4 +84,3 @@ classification, clustering, neural networks, and symbolic reasoning systems.
 <img height="165" src="https://github-readme-stats.vercel.app/api/top-langs/?username=msmahdinejad&layout=compact&hide_border=true&theme=transparent&langs_count=6" alt="Most used languages" />
 
 </div>
-```
