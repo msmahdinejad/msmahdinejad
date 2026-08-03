@@ -2,10 +2,13 @@
 
 # Hi 👋, I'm Saleh
 
-### Back-End Developer · AI Engineer · Agentic AI Builder
+### Full-Stack Developer · AI Engineer · Agentic AI Builder
 
-I build production-ready back-end systems, real-time applications,
-and intelligent AI agents that can reason, use tools, and take controlled actions.
+I build end-to-end software products, from scalable back-end systems
+and modern user interfaces to intelligent AI agents.
+
+My current focus is **Agentic AI**: building reliable agents that can reason,
+use tools, interact with applications, and take controlled actions.
 
 <br>
 
@@ -15,6 +18,7 @@ and intelligent AI agents that can reason, use tools, and take controlled action
 [![TREX](https://img.shields.io/badge/TREX_AI-7C3AED?style=for-the-badge\&logo=openai\&logoColor=white)](https://trexchat.ir)
 
 </div>
+
 
 <img src="https://user-images.githubusercontent.com/61057666/169029838-74df663d-2e62-4d77-bdff-b43f7d63f00f.png" alt="Developer banner" width="100%" />
 
