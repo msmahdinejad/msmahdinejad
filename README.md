@@ -4,32 +4,31 @@
 
 ### Full-Stack Developer · AI Engineer · Agentic AI Builder
 
-I build end-to-end software products, from scalable back-end systems
-and modern user interfaces to intelligent AI agents.
+I build end-to-end software products — from scalable back-end systems
+and modern user interfaces to intelligent, AI-powered applications.
 
 My current focus is **Agentic AI**: building reliable agents that can reason,
-use tools, interact with applications, and take controlled actions.
+retrieve evidence, use tools, interact with applications, and take controlled actions.
 
 <br>
 
 [![Email](https://img.shields.io/badge/Email-EA4335?style=for-the-badge\&logo=gmail\&logoColor=white)](mailto:msmahdinejad@gmail.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge\&logo=linkedin\&logoColor=white)](https://www.linkedin.com/in/msmahdinejad/)
+[![Telegram](https://img.shields.io/badge/Vertex_Studio-26A5E4?style=for-the-badge\&logo=telegram\&logoColor=white)](https://t.me/vertex_studi0)
 [![AsanBimeh](https://img.shields.io/badge/AsanBimeh-2563EB?style=for-the-badge\&logo=googlechrome\&logoColor=white)](https://asan-bimeh.ir)
 [![TREX](https://img.shields.io/badge/TREX_AI-7C3AED?style=for-the-badge\&logo=openai\&logoColor=white)](https://trexchat.ir)
 
 </div>
-
-
-<img src="https://user-images.githubusercontent.com/61057666/169029838-74df663d-2e62-4d77-bdff-b43f7d63f00f.png" alt="Developer banner" width="100%" />
 
 ---
 
 ## 👨‍💻 About Me
 
 * 🎓 Computer Engineering student at the **University of Isfahan**
-* 🤖 Focused on **Agentic AI**, LLM-powered applications, and intelligent automation
-* ⚙️ Building scalable back-end systems, asynchronous workflows, and real-time applications
-* 🧠 Interested in software architecture, machine learning, automated testing, and developer tools
+* 🤖 Currently focused on **Agentic AI**, LLM-powered applications, and intelligent automation
+* 💻 Building full-stack products with scalable back-end systems and modern front-end experiences
+* ⚙️ Experienced with asynchronous workflows, real-time applications, and production AI systems
+* 🧠 Interested in AI engineering, software architecture, machine learning, automated testing, and developer tools
 
 ---
 
@@ -38,9 +37,10 @@ use tools, interact with applications, and take controlled actions.
 I enjoy building AI systems that go beyond simple chat interfaces:
 
 * Tool-using and page-aware AI agents
+* Agentic retrieval and grounded generation
 * Structured outputs and schema validation
-* Text and voice interactions
-* Confirmation-based actions
+* Text, voice, and multimodal interactions
+* Confirmation-based and controlled actions
 * Multi-model conversational interfaces
 * Real-time LLM response streaming
 * Background AI workflows and persistent queues
@@ -49,6 +49,23 @@ I enjoy building AI systems that go beyond simple chat interfaces:
 ---
 
 ## 🚀 Featured Projects
+
+### 🔎 [SourceLens](https://github.com/msmahdinejad/SourceLens)
+
+**Multilingual research, grounded in evidence.**
+
+A self-hosted AI research workspace that turns documents, media, notes, and web sources into cited conversations and rich research outputs.
+
+* Agentic RAG with multi-step search, evidence-aware retrieval, and inspectable citations
+* Hybrid semantic + full-text retrieval with source, page, and section awareness
+* Multimodal ingestion for PDFs, images, audio, video, notes, and web pages
+* Research Studio for reports, podcasts, editable slides, videos, quizzes, flashcards, charts, maps, and more
+* Full English LTR and Persian RTL experience
+* Durable background jobs, live progress, cancellation, retries, and recovery
+
+`Python` `FastAPI` `SQLite` `Chroma` `FTS5` `SSE` `Node.js` `FFmpeg` `LLM APIs`
+
+<br>
 
 | [AsanBimeh](https://asan-bimeh.ir)                                    | [TREX AI Workspace](https://trexchat.ir)                                     |
 | :-------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
@@ -78,7 +95,9 @@ genetic algorithms, and fuzzy clustering.
 <br><br>
 
 ![AI Agents](https://img.shields.io/badge/AI_Agents-111827?style=flat-square\&logo=probot\&logoColor=white)
+![Agentic RAG](https://img.shields.io/badge/Agentic_RAG-0F766E?style=flat-square\&logo=openai\&logoColor=white)
 ![LLM APIs](https://img.shields.io/badge/LLM_APIs-412991?style=flat-square\&logo=openai\&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square\&logo=fastapi\&logoColor=white)
 ![WebSocket](https://img.shields.io/badge/WebSocket-010101?style=flat-square\&logo=socketdotio\&logoColor=white)
 ![Celery](https://img.shields.io/badge/Celery-37814A?style=flat-square\&logo=celery\&logoColor=white)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat-square\&logo=playwright\&logoColor=white)
@@ -103,5 +122,6 @@ genetic algorithms, and fuzzy clustering.
 ### Let's build something intelligent.
 
 [![Email](https://img.shields.io/badge/Get_in_Touch-msmahdinejad%40gmail.com-173B57?style=flat-square\&logo=gmail\&logoColor=white)](mailto:msmahdinejad@gmail.com)
+[![Telegram](https://img.shields.io/badge/Follow-Vertex_Studio-26A5E4?style=flat-square\&logo=telegram\&logoColor=white)](https://t.me/vertex_studi0)
 
 </div>
