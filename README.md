@@ -52,6 +52,23 @@ I enjoy building AI systems that go beyond simple chat interfaces:
 
 ## 🚀 Featured Projects
 
+### 🎧 [Avorythm](https://github.com/msmahdinejad/avorythm)
+
+**Hear every voice—or just read it—in your language.**
+
+An open-source platform for live translation, dubbing, and captions across desktop audio and browser tabs, with synchronized processing for uploaded audio and video.
+
+* Live translated speech with original and translated captions and independent output controls
+* Standalone Chrome and Edge extension with low-latency on-page playback or a synchronized, seekable player
+* Desktop app for Windows, macOS, and Linux, plus timestamped transcription, translation, and generated speech for media files
+* Persian and English interfaces, optional recording, and downloadable audio, subtitles, and video exports
+
+`Python` `JavaScript` `Gemini` `Groq Whisper` `FFmpeg` `Chrome Extension`
+
+[Install the Chrome extension](https://chromewebstore.google.com/detail/avorythm-live-translation/kbdbbedijheicmmnmoidamdaodjbhjje) · [Download desktop releases](https://github.com/msmahdinejad/avorythm/releases)
+
+<br>
+
 ### 🔎 [SourceLens](https://github.com/msmahdinejad/SourceLens)
 
 **Multilingual research, grounded in evidence.**
