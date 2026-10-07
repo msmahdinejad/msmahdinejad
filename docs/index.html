@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Mohammad Saleh Mahdinejad — developer in Isfahan">
 <meta property="og:description" content="Full-stack developer and AI engineer. I build agents that cite their sources, ask before they act, and survive a restart.">
-<meta property="og:image" content="https://msmahdinejad.github.io/msmahdinejad/assets/img/og.png">
+<meta property="og:image" content="https://msmahdinejad.github.io/msmahdinejad/assets/img/og.jpg">
 <meta property="og:url" content="https://msmahdinejad.github.io/msmahdinejad/">
 <meta name="twitter:card" content="summary_large_image">
 <script>
@@ -22,9 +22,17 @@
   try { theme = localStorage.getItem('theme'); } catch (e) {}
   if (!theme) theme = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   d.dataset.theme = theme; d.classList.add('js');
+  var c = navigator.connection, mem = navigator.deviceMemory, cores = navigator.hardwareConcurrency;
+  if ((c && c.saveData) || (mem && mem <= 2) || (cores && cores <= 2)) d.classList.add('lite');
 })();
 </script>
 <link rel="preload" href="assets/fonts/fraunces-hero.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="modulepreload" href="assets/js/main.js">
+<link rel="modulepreload" href="assets/js/hero.js">
+<link rel="modulepreload" href="assets/js/girih.js">
+<link rel="modulepreload" href="assets/js/fx.js">
+<link rel="modulepreload" href="assets/js/wall.js">
 <link rel="stylesheet" href="assets/css/site.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Person","name":"Mohammad Saleh Mahdinejad","url":"https://msmahdinejad.github.io/msmahdinejad/","image":"https://avatars.githubusercontent.com/u/154900233","jobTitle":"Full-stack developer and AI engineer","email":"mailto:msmahdinejad@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Isfahan","addressCountry":"IR"},"affiliation":{"@type":"CollegeOrUniversity","name":"University of Isfahan"},"sameAs":["https://github.com/msmahdinejad","https://www.linkedin.com/in/msmahdinejad/","https://t.me/vertex_studi0"]}

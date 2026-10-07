@@ -39,41 +39,29 @@ function splitWords(root) {
 }
 
 // ------------------------------------------------------------- the band
+// The drift itself is a CSS animation, so it runs on the compositor and costs the page nothing.
+// Scrolling only nudges its playback rate (and flips it when scrolling back up).
 function initBand() {
   const band = $('[data-band]');
-  if (!band) return;
-  const rows = $$('.band__row', band).map((row) => ({
-    track: $('.band__track', row), dir: +row.dataset.dir || 1, x: 0, w: 0,
-  }));
-  const measure = () => rows.forEach((r) => { r.w = r.track.scrollWidth / 2; });
-  measure();
-  addEventListener('resize', measure);
-  document.fonts.ready.then(measure);
-
-  let visible = false, raf = 0, last = 0, lastY = scrollY, vel = 0;
-  new IntersectionObserver((es) => {
-    visible = es[0].isIntersecting;
-    if (visible && !raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
-  }).observe(band);
-
-  function tick(now) {
+  if (!band || reduceQuery.matches) return;
+  const anims = $$('.band__track', band).map((t) => t.getAnimations()[0]).filter(Boolean);
+  if (!anims.length) return;
+  let lastY = scrollY, lastT = performance.now(), boost = 0, sign = 1, raf = 0;
+  const apply = () => anims.forEach((a) => { a.playbackRate = sign * (1 + boost); });
+  function settle() {
     raf = 0;
-    if (!visible) return;
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    const dy = scrollY - lastY;
-    lastY = scrollY;
-    vel += (dy / Math.max(dt, 0.001) - vel) * 0.12;            // smoothed scroll speed, px/s
-    const still = reduceQuery.matches;
-    for (const r of rows) {
-      if (!r.w) continue;
-      const speed = still ? 0 : (34 + Math.min(900, Math.abs(vel)) * 0.35) * r.dir * (vel < -5 ? -1 : 1);
-      r.x = (r.x - speed * dt) % r.w;
-      if (r.x > 0) r.x -= r.w;
-      r.track.style.transform = `translate3d(${r.x.toFixed(2)}px,0,0)`;
-    }
-    raf = requestAnimationFrame(tick);
+    boost *= 0.92;
+    if (boost < 0.02) { boost = 0; sign = 1; apply(); return; }
+    apply();
+    raf = requestAnimationFrame(settle);
   }
+  addEventListener('scroll', () => {
+    const now = performance.now(), dy = scrollY - lastY, dt = Math.max(8, now - lastT);
+    lastY = scrollY; lastT = now;
+    boost = Math.min(6, Math.max(boost, Math.abs(dy) / dt * 2.2));
+    sign = dy < 0 ? -1 : 1;
+    if (!raf) raf = requestAnimationFrame(settle);
+  }, { passive: true });
 }
 
 // --------------------------------------------------------- magnetic pull
@@ -117,7 +105,8 @@ function initParallax() {
 }
 
 // ------------------------------------------------------- footer wordmark
-// Each letter's weight follows the pointer; with no pointer around, a slow wave runs through it.
+// Each letter's weight follows the pointer. With no pointer around it plays one wave when it
+// comes into view, then rests. The loop only runs while something is changing.
 function initWordmark() {
   const mark = $('[data-mark]');
   if (!mark) return;
@@ -129,48 +118,58 @@ function initWordmark() {
     mark.append(s);
     return s;
   });
+  const REST = 300;
+  const set = (l, w) => { l.style.fontVariationSettings = `"wght" ${w.toFixed(0)}, "opsz" 144`; };
+
   // sized at the heaviest weight, so a fully swollen word still fits
+  let centres = [];
   const fit = () => {
     mark.style.fontSize = '100px';
-    const saved = letters.map((l) => l.style.fontVariationSettings);
-    letters.forEach((l) => { l.style.fontVariationSettings = '"wght" 900, "opsz" 144'; });
+    letters.forEach((l) => set(l, 900));
     const w = mark.scrollWidth;
-    letters.forEach((l, i) => { l.style.fontVariationSettings = saved[i]; });
-    const avail = mark.parentElement.clientWidth;
-    mark.style.fontSize = (100 * avail / w * 0.995).toFixed(2) + 'px';
+    mark.style.fontSize = (100 * mark.parentElement.clientWidth / w * 0.995).toFixed(2) + 'px';
+    letters.forEach((l, i) => set(l, weights[i]));
+    const r0 = mark.getBoundingClientRect();
+    centres = letters.map((l) => { const r = l.getBoundingClientRect(); return { x: r.left - r0.left + r.width / 2, y: r.top - r0.top + r.height / 2, h: r.height }; });
   };
+  const weights = letters.map(() => REST);
   document.fonts.ready.then(fit);
   addEventListener('resize', fit);
   fit();
 
-  let ptr = null, visible = false, raf = 0;
-  const host = mark.closest('footer') || mark;
-  host.addEventListener('pointermove', (e) => { ptr = { x: e.clientX, y: e.clientY, t: performance.now() }; wake(); }, { passive: true });
-  host.addEventListener('pointerleave', () => { ptr = null; });
-  new IntersectionObserver((es) => { visible = es[0].isIntersecting; wake(); }).observe(mark);
+  if (reduceQuery.matches) { letters.forEach((l) => set(l, 600)); return; }
 
-  const weights = letters.map(() => 300);
-  function wake() { if (!raf && visible && !reduceQuery.matches) raf = requestAnimationFrame(tick); }
+  let ptr = null, raf = 0, wave = -1;
+  const host = mark.closest('footer') || mark;
+  host.addEventListener('pointermove', (e) => { ptr = { x: e.clientX, y: e.clientY }; wake(); }, { passive: true });
+  host.addEventListener('pointerleave', () => { ptr = null; wake(); });
+  new IntersectionObserver((es) => {
+    if (es[0].isIntersecting && wave < 0) { wave = performance.now(); wake(); }
+  }, { threshold: 0.4 }).observe(mark);
+
+  function wake() { if (!raf) raf = requestAnimationFrame(tick); }
   function tick(now) {
     raf = 0;
-    if (!visible) return;
-    const rects = letters.map((l) => l.getBoundingClientRect());
-    const active = ptr && now - ptr.t < 3000;
+    const r0 = mark.getBoundingClientRect();
+    const t = wave >= 0 ? (now - wave) / 1000 : 99;
+    let moving = false;
     letters.forEach((l, i) => {
-      let target;
-      if (active) {
-        const r = rects[i];
-        const d = Math.hypot(ptr.x - (r.left + r.width / 2), (ptr.y - (r.top + r.height / 2)) * 0.6);
-        target = 300 + 600 * Math.exp(-(d * d) / (2 * Math.pow(r.height * 0.9, 2)));
-      } else {
-        target = 300 + 600 * Math.pow(0.5 + 0.5 * Math.sin(now / 900 - i * 0.55), 3);
+      const c = centres[i];
+      let target = REST;
+      if (ptr) {
+        const d = Math.hypot(ptr.x - (r0.left + c.x), (ptr.y - (r0.top + c.y)) * 0.6);
+        target = REST + 600 * Math.exp(-(d * d) / (2 * Math.pow(c.h * 0.9, 2)));
+      } else if (t < 2.6) {
+        const x = t * 1.6 - i / letters.length * 1.2;          // a crest that runs left to right once
+        target = REST + 600 * Math.exp(-Math.pow((x - 0.6) * 4, 2));
       }
-      weights[i] += (target - weights[i]) * 0.14;
-      l.style.fontVariationSettings = `"wght" ${weights[i].toFixed(0)}, "opsz" 144`;
+      const next = weights[i] + (target - weights[i]) * 0.16;
+      if (Math.abs(next - weights[i]) > 0.5 || Math.abs(target - next) > 0.5) moving = true;
+      weights[i] = next;
+      set(l, next);
     });
-    raf = requestAnimationFrame(tick);
+    if (moving || t < 2.6) raf = requestAnimationFrame(tick);
   }
-  if (reduceQuery.matches) letters.forEach((l) => { l.style.fontVariationSettings = '"wght" 600, "opsz" 144'; });
 }
 
 export function initEffects() {

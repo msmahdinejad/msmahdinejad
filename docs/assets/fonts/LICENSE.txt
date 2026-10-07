@@ -2,7 +2,7 @@ Fonts used by this site
 =======================
 
 All fonts are licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org).
-Files here are subsets / instances of the originals (axes pinned, glyphs trimmed); they are served from this folder, not from a third party.
+Files here are subsets / instances of the originals (some axes pinned, glyphs trimmed to Latin); they are served from this folder, not from a third party.
 
 Fraunces  (fraunces*.woff2)
   Copyright 2020 The Fraunces Project Authors (github.com/undercasetype/Fraunces)

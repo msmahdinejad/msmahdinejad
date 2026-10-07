@@ -64,21 +64,27 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
     c.setAttribute('aria-hidden', 'true');
     return c;
   };
+  // Two canvases: the wall (with the glaze painted into it) and the name (with its highlights).
+  // Each frame only touches the small rectangle that changed, restored from a cached copy.
   const cLines = canvas;
-  const cGlaze = layer('hero__glaze'), cName = layer('hero__inlay'), cBoost = layer('hero__boost');
-  cLines.after(cGlaze, cName, cBoost);
+  const cName = layer('hero__inlay');
+  cLines.after(cName);
   const gLines = cLines.getContext('2d');
-  const gGlaze = cGlaze.getContext('2d');
   const gName = cName.getContext('2d');
-  const gBoost = cBoost.getContext('2d');
 
   let S = null;
   let raf = 0, lastT = 0, lastDraw = 0, visible = true, destroyed = false;
   let ptr = null, ptrSeen = -1e9;
   let intro = 0, introStart = 0, introOn = false;
   let nextShimmer = 0, shim = null;
-  let dpr = Math.min(Math.ceil(window.devicePixelRatio || 1), 2);
-  const cost = { n: 0, sum: 0 };
+  const lite = document.documentElement.classList.contains('lite');   // save-data or a very small device
+  let dpr = lite ? 1 : Math.min(Math.ceil(window.devicePixelRatio || 1), 2);
+  // The wandering light and the shimmer are only for the first moments, or right after someone
+  // touches the hero. After that the wall sits still and the page costs nothing while idle.
+  const AWAKE_MS = 14000;
+  let awakeUntil = 0;
+  const wakeUp = () => { awakeUntil = performance.now() + AWAKE_MS; };
+  const cost = { n: 0, sum: 0, gap: 0, last: 0 };
 
   // ---------------------------------------------------------------- layout
   // `left`/`width` are the content column the name has to sit in, measured from the hero's left edge.
@@ -147,8 +153,8 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
       c.style.width = w + 'px'; c.style.height = h + 'px';
       c.style.top = top + 'px'; c.style.bottom = 'auto'; c.style.left = '0'; c.style.right = 'auto';
     };
-    size(cLines, W, H); size(cGlaze, W, H);
-    size(cName, box.w, box.h, box.y); size(cBoost, box.w, box.h, box.y);
+    size(cLines, W, H);
+    size(cName, box.w, box.h, box.y);
 
     const L = clamp(Math.round(lay.size * 0.075), 10, 26);
     const U = unitCell(L, 64);
@@ -265,25 +271,29 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
       }
     }
     tg.stroke();
-    gLines.setTransform(px, 0, 0, px, 0, 0);
-    gLines.clearRect(0, 0, W, H);
-    const pat = gLines.createPattern(tile, 'repeat');
+    const wall = makeCanvas(W * px, H * px);
+    const wg = wall.getContext('2d');
+    wg.setTransform(px, 0, 0, px, 0, 0);
+    const pat = wg.createPattern(tile, 'repeat');
     pat.setTransform(new DOMMatrix().scale(1 / k));
-    gLines.fillStyle = pat;
-    gLines.fillRect(0, 0, W, H);
+    wg.fillStyle = pat;
+    wg.fillRect(0, 0, W, H);
     // quieter toward the copy at the bottom
-    gLines.setTransform(1, 0, 0, 1, 0, 0);
-    gLines.globalCompositeOperation = 'destination-in';
-    const fade = gLines.createLinearGradient(0, 0, 0, H * px);
+    wg.setTransform(1, 0, 0, 1, 0, 0);
+    wg.globalCompositeOperation = 'destination-in';
+    const fade = wg.createLinearGradient(0, 0, 0, H * px);
     const y0 = clamp((S.top - 40) / H, 0, 1), y1 = clamp((S.top + S.lay.block + 20) / H, 0, 1);
     fade.addColorStop(0, 'rgba(0,0,0,.55)');
     fade.addColorStop(y0, 'rgba(0,0,0,.95)');
     fade.addColorStop(y1, 'rgba(0,0,0,.95)');
     fade.addColorStop(Math.min(1, y1 + 0.2), 'rgba(0,0,0,.3)');
     fade.addColorStop(1, 'rgba(0,0,0,.22)');
-    gLines.fillStyle = fade;
-    gLines.fillRect(0, 0, W * px, H * px);
-    gLines.globalCompositeOperation = 'source-over';
+    wg.fillStyle = fade;
+    wg.fillRect(0, 0, W * px, H * px);
+    S.wall = wall;
+    gLines.setTransform(1, 0, 0, 1, 0, 0);
+    gLines.clearRect(0, 0, cLines.width, cLines.height);
+    gLines.drawImage(wall, 0, 0);
 
     // ink outline around the lettering ...
     const halo = makeCanvas(box.w * px, box.h * px);
@@ -314,8 +324,6 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
     dg.drawImage(mo, 0, 0);
     S.layerName = done;
 
-    gGlaze.clearRect(0, 0, cGlaze.width, cGlaze.height);
-    gBoost.clearRect(0, 0, cBoost.width, cBoost.height);
     gName.setTransform(1, 0, 0, 1, 0, 0);
     gName.clearRect(0, 0, cName.width, cName.height);
     if (!introOn) { gName.drawImage(S.layerName, 0, 0); S.introDone = true; }
@@ -345,14 +353,15 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
   }
 
   const busy = () => introOn || shim || S.active.length > 0 || (ptr && performance.now() - ptrSeen < 1500);
+  const ambient = (now) => !lite && !reduceQuery.matches && now < awakeUntil;
 
   function frame(now) {
     raf = 0;
     if (destroyed || !S) return;
     const reduced = reduceQuery.matches;
     const hasPointer = ptr && now - ptrSeen < 1400;
-    // ambient light only needs 30 fps; pointer and intro get the full rate
-    if (!hasPointer && !introOn && now - lastDraw < 30) { schedule(); return; }
+    // ambient light only needs ~20 fps; pointer and intro get the full rate
+    if (!hasPointer && !introOn && now - lastDraw < 48) { schedule(); return; }
     lastDraw = now;
     const dt = Math.min(0.05, (now - lastT) / 1000 || 0.016);
     lastT = now;
@@ -361,7 +370,7 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
 
     let lx = null, ly = null, ls = 1;
     if (hasPointer) { lx = ptr.x; ly = ptr.y; }
-    else if (!reduced) {
+    else if (ambient(now)) {
       const t = now / 1000;
       lx = W * (0.5 + 0.38 * Math.sin(t * 0.13 + 0.6));
       ly = S.top + S.lay.block * (0.55 + 0.38 * Math.sin(t * 0.19 + 1.7));
@@ -391,19 +400,30 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
       grow(gb, f.cx + ox - S.L, f.cy + oy - S.L, f.cx + ox + S.L, f.cy + oy + S.L);
     }
     S.active = next;
-    gGlaze.setTransform(px, 0, 0, px, 0, 0);
-    if (S.gd) gGlaze.clearRect(S.gd.x0, S.gd.y0, S.gd.x1 - S.gd.x0, S.gd.y1 - S.gd.y0);
-    if (gb.x1 > gb.x0) {
-      gGlaze.lineWidth = 1;
-      for (const id of S.active) {
-        if (S.lit[id]) continue;
-        const h = S.heat[id], kind = S.U.faces[id % S.nu].kind;
-        path(gGlaze, id);
-        const a = clamp((h - 0.1) / 0.55, 0, 1);
-        gGlaze.fillStyle = css(pal.glaze[kind], a * a * (3 - 2 * a) * 0.95);
-        gGlaze.fill();
-        gGlaze.strokeStyle = css(pal.edge, 0.12 + h * 0.62);
-        gGlaze.stroke();
+    const dirty = S.gd ? { ...S.gd } : emptyBox();
+    if (gb.x1 > gb.x0) grow(dirty, gb.x0, gb.y0, gb.x1, gb.y1);
+    if (dirty.x1 > dirty.x0) {
+      const rx = Math.max(0, Math.floor(dirty.x0 * px)), ry = Math.max(0, Math.floor(dirty.y0 * px));
+      const rw = Math.min(cLines.width, Math.ceil(dirty.x1 * px)) - rx, rh = Math.min(cLines.height, Math.ceil(dirty.y1 * px)) - ry;
+      if (rw > 0 && rh > 0) {
+        gLines.save();
+        gLines.setTransform(1, 0, 0, 1, 0, 0);
+        gLines.clearRect(rx, ry, rw, rh);
+        gLines.drawImage(S.wall, rx, ry, rw, rh, rx, ry, rw, rh);
+        gLines.beginPath(); gLines.rect(rx, ry, rw, rh); gLines.clip();
+        gLines.setTransform(px, 0, 0, px, 0, 0);
+        gLines.lineWidth = 1;
+        for (const id of S.active) {
+          if (S.lit[id]) continue;
+          const h = S.heat[id], kind = S.U.faces[id % S.nu].kind;
+          path(gLines, id);
+          const a = clamp((h - 0.1) / 0.55, 0, 1);
+          gLines.fillStyle = css(pal.glaze[kind], a * a * (3 - 2 * a) * 0.95);
+          gLines.fill();
+          gLines.strokeStyle = css(pal.edge, 0.12 + h * 0.62);
+          gLines.stroke();
+        }
+        gLines.restore();
       }
     }
     S.gd = gb.x1 > gb.x0 ? gb : null;
@@ -412,7 +432,7 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
     if (progress) drawIntroName(progress);
 
     // shimmer across the lettering
-    if (!reduced && !introOn) {
+    if (!introOn && (shim || ambient(now))) {
       if (!shim && now > nextShimmer) shim = { t0: now, dur: 1900 };
       if (shim) {
         const p = (now - shim.t0) / shim.dur;
@@ -435,13 +455,15 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
     }
     drawBoost(progress ? [] : boosts);
 
-    // cheap self-check: if frames are costly on this machine, drop to 1x
-    cost.n++; cost.sum += performance.now() - t0;
-    if (cost.n === 90) {
-      if (cost.sum / cost.n > 9 && S.px > 1) { dpr = 1; build(); finishIntro(); }
-      cost.n = 0; cost.sum = 0;
+    // cheap self-check: if this machine struggles, first drop to 1x, then stop the idle light
+    cost.n++; cost.sum += performance.now() - t0; cost.gap += now - (cost.last || now); cost.last = now;
+    if (cost.n === 60) {
+      const work = cost.sum / cost.n, gap = cost.gap / cost.n;
+      if ((work > 9 || gap > 70) && S.px > 1) { dpr = 1; build(); finishIntro(); }
+      else if (work > 9 || gap > 70) awakeUntil = 0;
+      cost.n = 0; cost.sum = 0; cost.gap = 0;
     }
-    if (busy() || !reduced) schedule();
+    if (busy() || ambient(now)) schedule();
   }
 
   function finishIntro() {
@@ -474,42 +496,48 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
   }
 
   function drawBoost(list) {
-    const { box, mask, pal, L, px } = S;
+    const { box, mask, pal, L, px, tmp } = S;
+    if (!S.introDone) return;
     const nb = emptyBox();
     for (let k = 0; k < list.length; k += 2) {
       const { f, ox, oy } = faceXY(list[k]);
       grow(nb, f.cx + ox - L, f.cy + oy - L, f.cx + ox + L, f.cy + oy + L);
     }
-    const clear = S.bd ? { ...S.bd } : emptyBox();
-    if (nb.x1 > nb.x0) grow(clear, nb.x0, nb.y0, nb.x1, nb.y1);
-    const cx0 = Math.max(0, Math.floor(clear.x0)), cy0 = Math.max(box.y, Math.floor(clear.y0));
-    const cx1 = Math.min(box.w, Math.ceil(clear.x1)), cy1 = Math.min(box.y + box.h, Math.ceil(clear.y1));
-    if (cx1 > cx0 && cy1 > cy0) gBoost.clearRect((cx0) * px, (cy0 - box.y) * px, (cx1 - cx0) * px, (cy1 - cy0) * px);
+    const dirty = S.bd ? { ...S.bd } : emptyBox();
+    if (nb.x1 > nb.x0) grow(dirty, nb.x0, nb.y0, nb.x1, nb.y1);
     S.bd = list.length ? nb : null;
+    if (dirty.x1 <= dirty.x0) return;
+    // device-pixel rectangle inside the name canvas
+    const rx = Math.max(0, Math.floor(dirty.x0 * px)), ry = Math.max(0, Math.floor((dirty.y0 - box.y) * px));
+    const rw = Math.min(cName.width, Math.ceil(dirty.x1 * px)) - rx, rh = Math.min(cName.height, Math.ceil((dirty.y1 - box.y) * px)) - ry;
+    if (rw <= 0 || rh <= 0) return;
+    gName.setTransform(1, 0, 0, 1, 0, 0);
+    gName.clearRect(rx, ry, rw, rh);
+    gName.drawImage(S.layerName, rx, ry, rw, rh, rx, ry, rw, rh);
     if (!list.length) return;
 
-    const x0 = Math.max(0, Math.floor(nb.x0)), y0 = Math.max(box.y, Math.floor(nb.y0));
-    const x1 = Math.min(box.w, Math.ceil(nb.x1)), y1 = Math.min(box.y + box.h, Math.ceil(nb.y1));
-    if (x1 <= x0 || y1 <= y0) return;
-    gBoost.save();
-    gBoost.beginPath();
-    gBoost.rect(x0 * px, (y0 - box.y) * px, (x1 - x0) * px, (y1 - y0) * px);
-    gBoost.clip();
-    gBoost.setTransform(px, 0, 0, px, 0, -box.y * px);
-    gBoost.lineJoin = 'round';
-    gBoost.lineWidth = clamp(L * 0.05, 0.8, 1.3);
-    gBoost.strokeStyle = css(pal.edge, 0.78);
+    const tg = tmp.getContext('2d');
+    tg.setTransform(1, 0, 0, 1, 0, 0);
+    tg.globalCompositeOperation = 'source-over';
+    tg.clearRect(rx, ry, rw, rh);
+    tg.save();
+    tg.beginPath(); tg.rect(rx, ry, rw, rh); tg.clip();
+    tg.setTransform(px, 0, 0, px, 0, -box.y * px);
+    tg.lineJoin = 'round';
+    tg.lineWidth = clamp(L * 0.05, 0.8, 1.3);
+    tg.strokeStyle = css(pal.edge, 0.78);
     for (let k = 0; k < list.length; k += 2) {
       const id = list[k], v = list[k + 1];
-      path(gBoost, id);
-      gBoost.fillStyle = css(mix(tileColor(id), pal.shine[S.U.faces[id % S.nu].kind], clamp(v * 1.3, 0, 1)));
-      gBoost.fill();
-      gBoost.stroke();
+      path(tg, id);
+      tg.fillStyle = css(mix(tileColor(id), pal.shine[S.U.faces[id % S.nu].kind], clamp(v * 1.3, 0, 1)));
+      tg.fill();
+      tg.stroke();
     }
-    gBoost.setTransform(1, 0, 0, 1, 0, 0);
-    gBoost.globalCompositeOperation = 'destination-in';
-    gBoost.drawImage(mask, 0, 0);
-    gBoost.restore();
+    tg.setTransform(1, 0, 0, 1, 0, 0);
+    tg.globalCompositeOperation = 'destination-in';
+    tg.drawImage(mask, rx, ry, rw, rh, rx, ry, rw, rh);
+    tg.restore();
+    gName.drawImage(tmp, rx, ry, rw, rh, rx, ry, rw, rh);
   }
 
   function schedule() {
@@ -537,15 +565,16 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
     const r = root.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   }
-  const onMove = (e) => { ptr = toHero(e); ptrSeen = performance.now(); schedule(); };
+  const onMove = (e) => { ptr = toHero(e); ptrSeen = performance.now(); wakeUp(); schedule(); };
   const onLeave = () => { ptrSeen = -1e9; };
   root.addEventListener('pointermove', onMove, { passive: true });
   root.addEventListener('pointerdown', onMove, { passive: true });
   root.addEventListener('pointerleave', onLeave);
 
   const io = new IntersectionObserver((es) => {
+    const was = visible;
     visible = es[0].isIntersecting;
-    if (visible) { lastT = performance.now(); schedule(); }
+    if (visible) { if (!was) wakeUp(); lastT = performance.now(); schedule(); }
   }, { threshold: 0 });
   io.observe(root);
   const onVis = () => { if (!document.hidden) { lastT = performance.now(); schedule(); } };
@@ -568,6 +597,7 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
     lastW = Math.round(root.getBoundingClientRect().width);
     build();
     startIntro();
+    wakeUp();
     ro.observe(root);
     schedule();
     root.classList.add('is-ready');
@@ -590,7 +620,7 @@ export function createHero({ root, canvas, nameSlot, getTheme }) {
       root.removeEventListener('pointermove', onMove);
       root.removeEventListener('pointerdown', onMove);
       root.removeEventListener('pointerleave', onLeave);
-      cGlaze.remove(); cName.remove(); cBoost.remove();
+      cName.remove();
     },
   };
 }

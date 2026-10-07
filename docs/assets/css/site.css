@@ -124,8 +124,9 @@ ul, ol { list-style: none; }
 .hero__in { position: relative; min-height: 100svh; display: flex; flex-direction: column; padding-block: calc(var(--bar) + clamp(22px, 5vh, 54px)) clamp(22px, 4vh, 40px); }
 .hero__meta { display: flex; justify-content: space-between; gap: 16px; color: var(--ink-2); }
 .hero__place { display: inline-flex; align-items: center; gap: 10px; }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--turq); box-shadow: 0 0 0 0 color-mix(in srgb, var(--turq) 60%, transparent); animation: ping 2.8s var(--ease) infinite; }
-@keyframes ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--turq) 55%, transparent); } 70%, 100% { box-shadow: 0 0 0 9px transparent; } }
+.dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--turq); }
+.dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--turq); opacity: 0.5; animation: ping 2.8s var(--ease) infinite; }
+@keyframes ping { 0% { transform: scale(1); opacity: 0.5; } 70%, 100% { transform: scale(3.4); opacity: 0; } }
 .hero__name {
   margin-block: clamp(14px, 3vh, 34px) clamp(14px, 3vh, 30px);
   font-family: "FrauncesHero", var(--display); font-weight: 800; font-size: clamp(60px, 14vw, 230px); line-height: 0.9; letter-spacing: -0.02em;
@@ -175,7 +176,7 @@ ul, ol { list-style: none; }
   .cue { display: none; }
   .brand { font-size: 17px; gap: 10px; }
 }
-@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; } html { scroll-behavior: auto; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; } html { scroll-behavior: auto; } }
 
 /* ------------------------------------------------------------------ reveal */
 html.js [data-reveal] { opacity: 0; transform: translateY(26px); transition: opacity 0.9s var(--ease) var(--d, 0s), transform 0.9s var(--ease) var(--d, 0s); }
@@ -212,7 +213,7 @@ html.js [data-reveal]:not(.in) { animation: unhide 0.5s ease 3.5s forwards; }
 .portrait__img { position: absolute; inset: 0; clip-path: url(#arch); background: var(--paper-3); }
 .portrait__img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 24%; filter: saturate(0.94) contrast(1.02); transition: transform 1.2s var(--ease); }
 .portrait:hover .portrait__img img { transform: scale(1.04); }
-.portrait__star { position: absolute; width: 74px; inset-inline-end: -22px; bottom: 44px; animation: spin 48s linear infinite; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.18)); }
+.portrait__star { position: absolute; width: 74px; inset-inline-end: -22px; bottom: 44px; animation: spin 48s linear infinite; will-change: transform; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (max-width: 520px) { .portrait__star { inset-inline-end: 6px; width: 62px; } }
 .prose p { font-size: 18px; line-height: 1.72; color: var(--ink-2); max-width: 36em; margin-block-start: 1.05em; }
@@ -461,7 +462,7 @@ html.js [data-reveal]:not(.in) { animation: unhide 0.5s ease 3.5s forwards; }
 html:not(.js) .display .wi { transform: none; }
 
 /* ------------------------------------------------------------------ hero on scroll */
-.hero__inlay, .hero__boost { translate: 0 calc(var(--hs, 0) * 0.22px); }
+.hero__inlay { translate: 0 calc(var(--hs, 0) * 0.22px); }
 .hero__row { will-change: opacity; }
 
 /* ------------------------------------------------------------------ the band */
@@ -470,7 +471,9 @@ html:not(.js) .display .wi { transform: none; }
 .band::before { left: 0; background: linear-gradient(90deg, var(--paper-2), transparent); }
 .band::after { right: 0; background: linear-gradient(-90deg, var(--paper-2), transparent); }
 .band__row { overflow: visible; white-space: nowrap; }
-.band__track { display: inline-flex; align-items: center; will-change: transform; }
+.band__track { display: inline-flex; align-items: center; will-change: transform; animation: marquee 70s linear infinite; }
+.band__row--stack .band__track { animation-duration: 55s; animation-direction: reverse; }
+@keyframes marquee { to { transform: translate3d(-50%, 0, 0); } }
 .band__item { font-family: var(--display); font-weight: 640; font-size: clamp(46px, 8.4vw, 132px); line-height: 1.02; letter-spacing: -0.03em; padding-inline: 0.18em; font-variation-settings: "opsz" 144; }
 .band__item.is-outline { color: transparent; -webkit-text-stroke: 1.4px var(--ink); font-style: italic; font-weight: 520; }
 .band__star { width: clamp(28px, 3.6vw, 54px); height: auto; flex: none; margin-inline: 0.5em; fill: var(--saffron); stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; animation: spin 18s linear infinite; }
@@ -505,3 +508,23 @@ html:not(.js) .display .wi { transform: none; }
 .mark span { display: inline-block; }
 .foot__in { padding-top: 22px; border-top: 1px solid var(--line); }
 @media (prefers-reduced-motion: reduce) { .work .work__media, .work.in .work__media { clip-path: none; } .display .wi { transform: none !important; } .band__star { animation: none; } }
+
+/* ------------------------------------------------------------------ keeping it light */
+/* animations stop while their section is off screen (main.js toggles .is-off) */
+.is-off, .is-off * { animation-play-state: paused !important; }
+/* small or save-data devices: no blur behind the bar, no looping art */
+html.lite .bar.is-solid { backdrop-filter: none; background: var(--paper); }
+html.lite .band__track, html.lite .art *, html.lite .flow *, html.lite .portrait__star, html.lite .band__star { animation: none !important; }
+
+/* older browsers */
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .work, .site { --ct: var(--c); }
+  .bar.is-solid, .work__chip { background: var(--paper); }
+  .work__media { background: var(--paper-2); }
+  .a-door { fill: var(--saffron); }
+}
+@supports not (overflow: clip) {
+  html, body { overflow-x: hidden; }
+  .band, .hero, .foot__mark, .contact { overflow: hidden; }
+}
+@media (prefers-reduced-motion: reduce) { .band__track { animation: none; } }

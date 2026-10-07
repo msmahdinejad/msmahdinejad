@@ -128,15 +128,22 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
   }
 }
 
+// ------------------------------------------- pause what you can't see
+const offObs = new IntersectionObserver((es) => {
+  for (const e of es) e.target.classList.toggle('is-off', !e.isIntersecting);
+}, { rootMargin: '120px 0px' });
+$$('.hero, .band, [data-section]').forEach((el) => offObs.observe(el));
+
 // ----------------------------------------------------------- videos
 const videos = $$('video[data-src]');
 function inView(v) {
   const r = v.getBoundingClientRect();
   return r.bottom > innerHeight * 0.1 && r.top < innerHeight * 0.9 && r.width > 0;
 }
+const lite = html.classList.contains('lite');
 function syncVideo(v) {
   if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster;
-  if (reduced()) { v.pause(); return; }
+  if (reduced() || lite) { v.pause(); return; }      // the poster is enough on save-data / tiny devices
   if (inView(v) && !document.hidden) {
     if (!v.getAttribute('src')) v.src = v.dataset.src;
     v.play().catch(() => {});
