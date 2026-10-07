@@ -4,7 +4,6 @@
     PLATE_TMP=/some/dir python3 scripts/plates.py
 """
 import os
-import sys
 from pathlib import Path
 
 from PIL import Image
@@ -26,13 +25,16 @@ def still(name, quality=84):
     print(dest.name, f'{dest.stat().st_size / 1024:.0f} KB')
 
 
-def animated(name, quality=62, step=1):
+def animated(name, quality=60, start=0, end=49, width=640):
+    """The first scenes of the showreel ("I make things move"): flat colours, so they compress
+    well, and every frame is kept so the motion stays smooth."""
     folder = TMP / f'{name}-frames'
-    files = sorted(folder.glob('*.png'))[::step]
-    frames = [fit(Image.open(f)) for f in files]
+    files = sorted(folder.glob('*.png'))[start:end]
+    size = (width, round(width * H / W))
+    frames = [Image.open(f).convert('RGBA').resize(size, Image.LANCZOS) for f in files]
     dest = OUT / f'plate-{name}.webp'
-    frames[0].save(dest, 'WEBP', save_all=True, append_images=frames[1:], duration=int(71 * step), loop=0,
-                   quality=quality, method=6, alpha_quality=90, minimize_size=True)
+    frames[0].save(dest, 'WEBP', save_all=True, append_images=frames[1:], duration=71, loop=0,
+                   quality=quality, method=6, alpha_quality=80, minimize_size=True, allow_mixed=True)
     print(dest.name, len(frames), 'frames', f'{dest.stat().st_size / 1024:.0f} KB')
 
 
@@ -40,4 +42,4 @@ if __name__ == '__main__':
     OUT.mkdir(exist_ok=True)
     for n in ('avorythm', 'sourcelens', 'newsroom'):
         still(n)
-    animated('cinewright', quality=int(sys.argv[1]) if len(sys.argv) > 1 else 62)
+    animated('cinewright')

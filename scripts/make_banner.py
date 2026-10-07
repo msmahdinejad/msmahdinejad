@@ -135,11 +135,13 @@ def build(theme_name, out):
                 f'<stop offset=".55" stop-color="{hx(c)}"/>'
                 f'<stop offset="1" stop-color="{hx(mix(c, (0, 0, 0), .2))}"/></linearGradient>')
 
-    mosaic_block = []
+    # one path per fill keeps the element count (and the drawing work) low
+    by_fill = {}
     for j in range(K):
         for i in range(K):
             for kind, _, _, pts in cell_faces(L, i, j):
-                mosaic_block.append(f'<polygon points="{poly_points(pts)}" fill="url(#g{kind}{rng.randrange(7)})"/>')
+                by_fill.setdefault(f'g{kind}{rng.randrange(7)}', []).append('M' + 'L'.join(f'{f1(x)} {f1(y)}' for x, y in pts) + 'Z')
+    mosaic_block = [f'<path d="{"".join(d)}" fill="url(#{g})"/>' for g, d in sorted(by_fill.items())]
 
     s = L / 100
     K2 = 8
@@ -184,15 +186,17 @@ def build(theme_name, out):
     patches = []
     R = L * 2.4
     for n, (gx, gy) in enumerate(centres):
-        polys = []
+        groups = {}
         for j in range(int((gy - R) / L) - 1, int((gy + R) / L) + 2):
             for i in range(int((gx - R) / L) - 1, int((gx + R) / L) + 2):
                 for kind, cx, cy, pts in cell_faces(L, i, j):
                     d = math.hypot(cx - gx, cy - gy)
                     if d < R and not near_letters(cx, cy, 14) and not in_keepout(cx, cy):
-                        a = (1 - d / R) ** 1.3
-                        polys.append(f'<polygon points="{poly_points(pts)}" fill="{hx(T["glaze"][kind])}" fill-opacity="{a:.2f}"/>')
-        patches.append(f'<g class="gl" style="animation-delay:{2.6 + n * 1.2:.1f}s">{"".join(polys)}</g>')
+                        a = round((1 - d / R) ** 1.3 * 10) / 10      # 10 opacity steps is plenty
+                        if a > 0:
+                            groups.setdefault((kind, a), []).append('M' + 'L'.join(f'{f1(x)} {f1(y)}' for x, y in pts) + 'Z')
+        paths = ''.join(f'<path d="{"".join(d)}" fill="{hx(T["glaze"][k])}" fill-opacity="{a:g}"/>' for (k, a), d in sorted(groups.items()))
+        patches.append(f'<g class="gl" style="animation-delay:{2.6 + n * 1.2:.1f}s">{paths}</g>')
     glaze = ''.join(patches)
     n_patch = len(centres)
 
@@ -226,7 +230,8 @@ def build(theme_name, out):
 {''.join(grads)}
 <g id="mb" stroke="{T['edge']}" stroke-opacity=".62" stroke-width=".75" stroke-linejoin="round">{''.join(mosaic_block)}</g>
 <path id="wb" d="{wall_d}" fill="none" stroke="{T['ink']}" stroke-opacity="{T['lines']}" stroke-width=".9" stroke-linecap="round"/>
-<clipPath id="names"><path d="{en_d}"/></clipPath>
+<path id="nm" pathLength="1" d="{en_d}"/>
+<clipPath id="names"><use href="#nm" xlink:href="#nm"/></clipPath>
 <linearGradient id="feather" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".625" stop-color="#fff"/><stop offset=".875" stop-color="#000"/><stop offset="1" stop-color="#000"/></linearGradient>
 <mask id="reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="{W}" height="{H}"><rect class="rv" x="0" y="0" width="3200" height="{H}" fill="url(#feather)"/></mask>
 <linearGradient id="sheenG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
@@ -235,7 +240,7 @@ def build(theme_name, out):
 <g class="wall">{wall_uses}</g>
 <g clip-path="url(#names)"><g mask="url(#reveal)">{mosaic_uses}</g></g>
 <g clip-path="url(#names)"><rect class="sheen" x="0" y="-30" width="280" height="{H + 60}" fill="url(#sheenG)"/></g>
-<path class="o" pathLength="1" d="{en_d}"/>
+<use class="o" href="#nm" xlink:href="#nm"/>
 <g>{glaze}</g>
 <g class="meta" fill="{T['ink2']}">
 <g transform="translate({MARGIN} 46)"><g class="spin"><path d="{star_d}" fill="none" stroke="{T['accent']}" stroke-width="1.9" stroke-linejoin="round"/></g></g>
