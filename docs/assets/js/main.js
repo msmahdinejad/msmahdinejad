@@ -18,7 +18,7 @@ const nf = new Intl.NumberFormat('en-US');
 const heroEl = $('[data-hero]');
 const hero = createHero({
   root: heroEl,
-  canvas: $('.hero__wall', heroEl),
+  wall: $('.hero__wall', heroEl),
   nameSlot: $('[data-name-slot]', heroEl),
   getTheme: () => state.theme,
 });
@@ -31,8 +31,8 @@ function setTheme(theme) {
   state.theme = theme;
   html.dataset.theme = theme;
   store.set('theme', theme);
-  hero.refresh({ replay: false });
   wall.refresh();
+  return hero.refresh({ replay: false });     // the view transition waits for the new hero
 }
 
 function toggleTheme(origin) {

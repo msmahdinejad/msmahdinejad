@@ -121,6 +121,29 @@ ul, ol { list-style: none; }
 /* ------------------------------------------------------------------ hero */
 .hero { position: relative; min-height: 100svh; overflow: clip; isolation: isolate; }
 .hero__wall { position: absolute; left: 0; top: 0; z-index: -1; pointer-events: none; }
+/* hero.js stacks these over the wall; every moving part below is a transform or opacity */
+.hero__shine { position: absolute; left: 0; z-index: -1; pointer-events: none; overflow: hidden;
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+.hero__band, .hero__spot { position: absolute; top: 0; left: 0; display: block; will-change: transform; }
+.hero__band { width: 34%; height: 100%; transform: translateX(-110%);
+  background: linear-gradient(105deg, transparent 22%, rgb(214 246 255 / 0.08) 38%, rgb(226 250 255 / 0.4) 50%, rgb(214 246 255 / 0.08) 62%, transparent 78%);
+  animation: hero-band 7.2s cubic-bezier(.45, .05, .3, 1) 1.5s infinite; }
+@keyframes hero-band { 0% { transform: translateX(-110%); } 30%, 100% { transform: translateX(310%); } }
+.hero__spot { width: 360px; height: 360px; margin: -180px 0 0 -180px; opacity: 0; transition: opacity .5s;
+  background: radial-gradient(closest-side, rgb(200 244 255 / 0.36), rgb(200 244 255 / 0.12) 55%, transparent); }
+.hero__shine.has-spot .hero__spot { opacity: 1; transition-duration: .2s; }
+/* the intro: the wall settles in, then the inlay is laid from left to right with the light on its edge */
+.hero.is-intro .hero__lines { animation: hero-fade 1.1s ease-out both; }
+.hero.is-intro .hero__glaze { animation: hero-fade 1.1s ease-out both; }
+.hero.is-intro .hero__inlay {
+  -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%); mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  -webkit-mask-size: 300% 100%; mask-size: 300% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  animation: hero-lay 1.7s cubic-bezier(.5, 0, .2, 1) .15s both; }
+.hero.is-intro .hero__band { animation: hero-band-in 1.7s cubic-bezier(.5, 0, .2, 1) .15s both, hero-band 7.2s cubic-bezier(.45, .05, .3, 1) 3.2s infinite; }
+@keyframes hero-fade { from { opacity: 0; } }
+@keyframes hero-lay { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; } to { -webkit-mask-position: 0 0; mask-position: 0 0; } }
+@keyframes hero-band-in { from { transform: translateX(-110%); } to { transform: translateX(310%); } }
+@media (prefers-reduced-motion: reduce) { .hero__band, .hero__spot { display: none; } .hero.is-intro .hero__inlay { -webkit-mask-image: none; mask-image: none; } }
 .hero__in { position: relative; min-height: 100svh; display: flex; flex-direction: column; padding-block: calc(var(--bar) + clamp(22px, 5vh, 54px)) clamp(22px, 4vh, 40px); }
 .hero__meta { display: flex; justify-content: space-between; gap: 16px; color: var(--ink-2); }
 .hero__place { display: inline-flex; align-items: center; gap: 10px; }
@@ -461,9 +484,6 @@ html.js [data-reveal]:not(.in) { animation: unhide 0.5s ease 3.5s forwards; }
 .display.in .wi { transform: none; }
 html:not(.js) .display .wi { transform: none; }
 
-/* ------------------------------------------------------------------ hero on scroll */
-.hero__inlay { translate: 0 calc(var(--hs, 0) * 0.22px); }
-.hero__row { will-change: opacity; }
 
 /* ------------------------------------------------------------------ the band */
 .band { position: relative; padding-block: clamp(28px, 4vw, 54px); border-block: 1px solid var(--line); overflow: clip; background: var(--paper-2); }

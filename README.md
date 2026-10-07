@@ -1,8 +1,8 @@
 <p align="center">
   <a href="https://msmahdinejad.github.io/msmahdinejad/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/msmahdinejad/msmahdinejad/main/assets/hero-dark.svg">
-      <img src="https://raw.githubusercontent.com/msmahdinejad/msmahdinejad/main/assets/hero-light.svg" alt="Mohammad Saleh Mahdinejad, full-stack developer and AI engineer in Isfahan, with the name set in girih tile mosaic." width="100%">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/msmahdinejad/msmahdinejad/main/assets/hero-dark.webp">
+      <img src="https://raw.githubusercontent.com/msmahdinejad/msmahdinejad/main/assets/hero-light.webp" alt="Mohammad Saleh Mahdinejad, full-stack developer and AI engineer in Isfahan, with the name set in girih tile mosaic." width="100%">
     </picture>
   </a>
 </p>

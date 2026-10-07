@@ -79,26 +79,33 @@ function initMagnetic() {
 }
 
 // ------------------------------------------------------- scroll parallax
+// The hero's lettering drifts a little slower than the page and the copy fades out. Sizes are read
+// once per resize, and every frame reads all positions before it writes anything, so scrolling never
+// forces an extra layout.
 function initParallax() {
   const hero = $('[data-hero]');
   const row = hero && $('.hero__row', hero);
   const frames = $$('.work__frame');
-  let ticking = false;
+  let ticking = false, heroH = hero ? hero.offsetHeight : 0, heroDone = false;
+  addEventListener('resize', () => { heroH = hero ? hero.offsetHeight : 0; }, { passive: true });
   const update = () => {
     ticking = false;
     if (reduceQuery.matches) return;
     const y = scrollY, vh = innerHeight;
-    if (hero && y < hero.offsetHeight) {
-      const k = y / hero.offsetHeight;
-      hero.style.setProperty('--hs', y.toFixed(1));
-      if (row) row.style.opacity = clamp(1 - k * 1.6, 0, 1).toFixed(3);
-    }
+    const spots = [];
     for (const f of frames) {
       const r = f.parentElement.getBoundingClientRect();
       if (r.bottom < 0 || r.top > vh) continue;
-      const p = (r.top + r.height / 2 - vh / 2) / vh;              // -1 .. 1 across the viewport
-      f.style.setProperty('--py', (p * -26).toFixed(1) + 'px');
+      spots.push([f, (r.top + r.height / 2 - vh / 2) / vh]);       // -1 .. 1 across the viewport
     }
+    if (hero && (y < heroH || !heroDone)) {
+      const yy = Math.min(y, heroH);
+      heroDone = y >= heroH;
+      const drift = `0 ${(yy * 0.22).toFixed(1)}px`;
+      for (const el of hero.querySelectorAll('.hero__inlay, .hero__shine')) el.style.translate = drift;
+      if (row) row.style.opacity = clamp(1 - (yy / heroH) * 1.6, 0, 1).toFixed(3);
+    }
+    for (const [f, p] of spots) f.style.setProperty('--py', (p * -26).toFixed(1) + 'px');
   };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   update();

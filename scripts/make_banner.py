@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Builds the animated banner for the profile README (assets/hero-light.svg and hero-dark.svg).
+"""Builds the source SVG of the README banner (scripts/build/hero-light.svg and hero-dark.svg).
 
-GitHub shows README images through <img>: no scripts, no web fonts, no outside requests. So everything
-here is plain vector: the letters are outlines (see glyphs.py), the mosaic is the girih cell repeated
-with <use>, and the motion is CSS inside the file.
+Everything is plain vector: the letters are outlines (see glyphs.py), the mosaic is the girih cell
+repeated with <use>, and the glaze is CSS animation. The README itself shows a pre-rendered loop of
+this file (see banner-frames.mjs and banner_webp.py), because a browser redraws every tile of an
+animated SVG on every frame.
 
     python3 scripts/make_banner.py
 """
@@ -211,12 +212,8 @@ def build(theme_name, out):
 .wall{{animation:fade 1.4s ease .1s both}}
 .meta{{animation:fade 1s ease 1.4s both}}
 @keyframes fade{{from{{opacity:0}}}}
-.sheen{{animation:sheen 8s linear 3.2s infinite}}
-@keyframes sheen{{from{{transform:translateX(-520px) skewX(-20deg)}}to{{transform:translateX(2200px) skewX(-20deg)}}}}
 .gl{{opacity:0;animation:gl 7.2s ease-in-out infinite}}
 @keyframes gl{{0%,100%{{opacity:0}}20%,44%{{opacity:1}}}}
-.spin{{transform-box:fill-box;transform-origin:center;animation:spin 48s linear infinite}}
-@keyframes spin{{to{{transform:rotate(360deg)}}}}
 @media (prefers-reduced-motion:reduce){{*{{animation:none!important}}.gl{{opacity:0}}}}
 '''
 
@@ -234,16 +231,14 @@ def build(theme_name, out):
 <clipPath id="names"><use href="#nm" xlink:href="#nm"/></clipPath>
 <linearGradient id="feather" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".625" stop-color="#fff"/><stop offset=".875" stop-color="#000"/><stop offset="1" stop-color="#000"/></linearGradient>
 <mask id="reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="{W}" height="{H}"><rect class="rv" x="0" y="0" width="3200" height="{H}" fill="url(#feather)"/></mask>
-<linearGradient id="sheenG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
 </defs>
 <rect width="{W}" height="{H}" fill="{T['bg']}"/>
 <g class="wall">{wall_uses}</g>
 <g clip-path="url(#names)"><g mask="url(#reveal)">{mosaic_uses}</g></g>
-<g clip-path="url(#names)"><rect class="sheen" x="0" y="-30" width="280" height="{H + 60}" fill="url(#sheenG)"/></g>
 <use class="o" href="#nm" xlink:href="#nm"/>
 <g>{glaze}</g>
 <g class="meta" fill="{T['ink2']}">
-<g transform="translate({MARGIN} 46)"><g class="spin"><path d="{star_d}" fill="none" stroke="{T['accent']}" stroke-width="1.9" stroke-linejoin="round"/></g></g>
+<g transform="translate({MARGIN} 46)"><path d="{star_d}" fill="none" stroke="{T['accent']}" stroke-width="1.9" stroke-linejoin="round"/></g>
 <path d="{meta_l}"/><path d="{meta_r}"/>
 </g>
 <g class="meta" fill="{T['ink']}"><path d="{tag1}"/></g>
@@ -255,7 +250,9 @@ def build(theme_name, out):
 
 
 if __name__ == '__main__':
-    assets = ROOT / 'assets'
-    assets.mkdir(exist_ok=True)
-    build('light', assets / 'hero-light.svg')
-    build('dark', assets / 'hero-dark.svg')
+    # The SVG is the source of the README banner. It is not shown directly: banner-frames.mjs
+    # photographs one loop of it and banner_webp.py packs that into assets/hero-*.webp.
+    out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'scripts' / 'build'
+    out.mkdir(parents=True, exist_ok=True)
+    build('light', out / 'hero-light.svg')
+    build('dark', out / 'hero-dark.svg')
