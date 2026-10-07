@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Social card</title>
+<link rel="stylesheet" href="/docs/assets/css/site.css">
+<style>
+  html, body { margin: 0; background: var(--paper); }
+  body::after { display: none; }
+  .card { position: relative; width: 1200px; height: 630px; overflow: hidden; isolation: isolate; min-height: 0; }
+  .card .hero__in { min-height: 0; height: 100%; padding: 48px 0 0; width: 1094px; margin-inline: 53px 0; }
+  .card .hero__name { margin: 22px 0 0; }
+  .tag { position: absolute; left: 53px; right: 53px; bottom: 40px; display: flex; justify-content: space-between; align-items: end; }
+  .tag p { font: italic 440 31px/1.22 var(--display); font-variation-settings: "opsz" 48; margin: 0; max-width: 17em; text-wrap: balance; }
+  .tag p em { color: var(--accent); }
+  .tag .mono { color: var(--ink-3); text-align: right; line-height: 1.7; }
+</style>
+</head>
+<body>
+<section class="hero card" id="card" data-hero>
+  <canvas class="hero__wall" aria-hidden="true"></canvas>
+  <div class="hero__in">
+    <div class="hero__meta mono"><span class="hero__place"><i class="dot" style="animation:none"></i>Isfahan, Iran</span><span>2026</span></div>
+    <h1 class="hero__name" data-name-slot>Mohammad Saleh Mahdinejad</h1>
+  </div>
+  <div class="tag">
+    <p>Full-stack developer and AI engineer. I&nbsp;build agents that <em>cite their sources</em>.</p>
+    <div class="mono">github.com/msmahdinejad</div>
+  </div>
+</section>
+<script type="module">
+  import { createHero } from '/docs/assets/js/hero.js';
+  const root = document.getElementById('card');
+  window.__hero = createHero({ root, canvas: root.querySelector('canvas'), nameSlot: root.querySelector('[data-name-slot]'), getTheme: () => 'light' });
+</script>
+</body>
+</html>
