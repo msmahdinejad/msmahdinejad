@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Builds the source SVG of the README banner (scripts/build/hero-light.svg and hero-dark.svg).
+"""Builds the README banner (assets/hero-light.svg and assets/hero-dark.svg).
 
-Everything is plain vector: the letters are outlines (see glyphs.py), the mosaic is the girih cell
-repeated with <use>, and the glaze is CSS animation. The README itself shows a pre-rendered loop of
-this file (see banner-frames.mjs and banner_webp.py), because a browser redraws every tile of an
-animated SVG on every frame.
+Everything is plain vector and nothing moves: the letters are outlines (see glyphs.py) and the
+mosaic is the girih cell repeated with <use>. An animated SVG inside <img> is redrawn whole on every
+frame, which is what made the top of the profile stutter, so the banner stays still.
 
-    python3 scripts/make_banner.py
+    python3 scripts/make_banner.py [out-dir] [tile-size-as-a-fraction-of-the-lettering]
 """
 import json
 import math
@@ -25,19 +24,19 @@ CELL = json.loads((Path(__file__).parent / 'cell.json').read_text())
 
 W, H = 1600, 520
 MARGIN = 88
+NAME = 'Saleh'
+LETTER_TOP = 112     # where the top of the tallest letter sits
+GAP_BELOW = 88       # baseline of the name to baseline of the tagline
+TILE = 0.055         # girih cell size as a fraction of the lettering size
 
 THEMES = {
     'light': dict(
         bg='#f3eee3', ink='#101826', ink2='#3b4457', accent='#09706a', edge='#0a1022', lines=0.11,
         tile=[(22, 48, 128), (20, 176, 160), (226, 164, 52)],
-        glaze=[(46, 92, 222), (18, 192, 172), (240, 172, 44)],
-        shine=[(70, 122, 250), (64, 236, 212), (255, 214, 104)],
     ),
     'dark': dict(
         bg='#0b1020', ink='#ece7db', ink2='#b9b8b2', accent='#3ccfc0', edge='#040712', lines=0.15,
         tile=[(52, 86, 206), (37, 194, 177), (240, 185, 85)],
-        glaze=[(78, 116, 240), (52, 214, 192), (250, 196, 96)],
-        shine=[(128, 168, 255), (116, 255, 232), (255, 226, 142)],
     ),
 }
 
@@ -69,7 +68,7 @@ def cell_faces(L, i, j):
         yield f['kind'], (f['cx'] + i * 100) * s, (f['cy'] + j * 100) * s, pts
 
 
-def build(theme_name, out):
+def build(theme_name, out, tile=TILE):
     T = THEMES[theme_name]
     rng = random.Random(1403)
 
@@ -78,17 +77,14 @@ def build(theme_name, out):
     mono = str(FONTS / 'fragment-mono.woff2')
     ital = str(FONTS / 'fraunces-italic.woff2')
 
-    # given name small, surname across the full width
-    fit = text_path(en_font, 'Mahdinejad', 100)[1]
+    # one word, across the full width
+    fit = text_path(en_font, NAME, 100)[1]
     size = 100 * (W - 2 * MARGIN) / fit
-    k1 = 0.5
-    b1 = 112 + size * k1 * 0.72
-    b2 = b1 + size * 0.84
+    top_probe = contours(text_path(en_font, NAME, size, x=MARGIN, y=0)[0])
+    b1 = LETTER_TOP - min(p[1] for c in top_probe for p in c)      # baseline that puts the tallest letter at LETTER_TOP
     en_size = size
-    d1, w1, _, _ = text_path(en_font, 'Mohammad Saleh', size * k1, x=MARGIN, y=b1)
-    d2, _, _, _ = text_path(en_font, 'Mahdinejad', size, x=MARGIN, y=b2)
-    en_d = d1 + d2
-    tag_y = b2 + 92
+    en_d = text_path(en_font, NAME, size, x=MARGIN, y=b1)[0]
+    tag_y = b1 + GAP_BELOW
 
     def mono_line(text, y, size=25, right=None, x=MARGIN, track=0.06):
         w = text_path(mono, text, size, tracking=track)[1]
@@ -99,7 +95,6 @@ def build(theme_name, out):
     meta_r = mono_line('COMPUTER ENGINEERING · UNIVERSITY OF ISFAHAN', 68, right=W - MARGIN)
     tag1 = text_path(ital, 'Full-stack developer and AI engineer.', 46, variations={'wght': 440, 'opsz': 48}, x=MARGIN, y=tag_y)[0]
     tag2 = mono_line('GITHUB.COM/MSMAHDINEJAD', tag_y - 8, size=22, right=W - MARGIN)
-    line1_end = MARGIN + w1
     H = int(round(tag_y + 56))
 
     letters = contours(en_d)
@@ -120,7 +115,7 @@ def build(theme_name, out):
         return 0 <= xi < W and 0 <= yi < H and px[xi, yi] > 0
 
     # ---- tile geometry ---------------------------------------------------------------------
-    L = round(en_size * 0.095, 2)
+    L = round(en_size * tile, 2)
     K = 6
 
     # gradients: one per (kind, tint)
@@ -170,89 +165,38 @@ def build(theme_name, out):
     mosaic_uses = uses('mb', K * L, bbox[0] - 4, bbox[1] - 4, bbox[2] + 4, bbox[3] + 4)
     wall_uses = uses('wb', K2 * L, 0, 0, W, H)
 
-    # ---- glaze patches: small clusters of neighbouring wall tiles that fade in and out -----------
-    keep_out = [(MARGIN - 20, tag_y - 52, MARGIN + 880, H), (0, 0, W, 96), (W - 470, tag_y - 40, W, H)]   # tagline, meta row, link
-
-    def in_keepout(x, y):
-        return any(a <= x <= c and b <= y <= d for a, b, c, d in keep_out)
-
-    def near_letters(x, y, r=26):
-        return any(inside(x + dx, y + dy) for dx in (-r, 0, r) for dy in (-r, 0, r))
-
-    # a short run of glaze in the open space to the right of the given name
-    cy = (100 + b1) / 2
-    xs_ = [line1_end + 110 + i * (W - MARGIN - 80 - line1_end - 110) / 3 for i in range(4)]
-    centres = [(x, cy + (18 if i % 2 else -14)) for i, x in enumerate(xs_)]
-
-    patches = []
-    R = L * 2.4
-    for n, (gx, gy) in enumerate(centres):
-        groups = {}
-        for j in range(int((gy - R) / L) - 1, int((gy + R) / L) + 2):
-            for i in range(int((gx - R) / L) - 1, int((gx + R) / L) + 2):
-                for kind, cx, cy, pts in cell_faces(L, i, j):
-                    d = math.hypot(cx - gx, cy - gy)
-                    if d < R and not near_letters(cx, cy, 14) and not in_keepout(cx, cy):
-                        a = round((1 - d / R) ** 1.3 * 10) / 10      # 10 opacity steps is plenty
-                        if a > 0:
-                            groups.setdefault((kind, a), []).append('M' + 'L'.join(f'{f1(x)} {f1(y)}' for x, y in pts) + 'Z')
-        paths = ''.join(f'<path d="{"".join(d)}" fill="{hx(T["glaze"][k])}" fill-opacity="{a:g}"/>' for (k, a), d in sorted(groups.items()))
-        patches.append(f'<g class="gl" style="animation-delay:{2.6 + n * 1.2:.1f}s">{paths}</g>')
-    glaze = ''.join(patches)
-    n_patch = len(centres)
-
     star_d = 'M' + 'L'.join(f'{f1(x * .28)} {f1(y * .28)}' for x, y in STAR) + 'Z'
 
-    css = f'''
-.o{{fill:none;stroke:var(--ink);stroke-width:3.4;stroke-linejoin:round;stroke-dasharray:1;animation:draw 1.7s cubic-bezier(.3,.6,.2,1) .2s both}}
-.o2{{animation-delay:.7s}}
-@keyframes draw{{from{{stroke-dashoffset:1}}to{{stroke-dashoffset:0}}}}
-.rv{{transform:translateX(-400px);animation:rv 2.2s cubic-bezier(.4,.1,.2,1) .55s both}}
-@keyframes rv{{from{{transform:translateX(-2800px)}}}}
-.wall{{animation:fade 1.4s ease .1s both}}
-.meta{{animation:fade 1s ease 1.4s both}}
-@keyframes fade{{from{{opacity:0}}}}
-.gl{{opacity:0;animation:gl 7.2s ease-in-out infinite}}
-@keyframes gl{{0%,100%{{opacity:0}}20%,44%{{opacity:1}}}}
-@media (prefers-reduced-motion:reduce){{*{{animation:none!important}}.gl{{opacity:0}}}}
-'''
-
+    sw = max(0.7, round(L * 0.033, 2))
+    ring = round(en_size * 0.0095, 1)
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {W} {H}" role="img" aria-labelledby="t">
-<title id="t">Mohammad Saleh Mahdinejad, full-stack developer and AI engineer in Isfahan. The name is set in girih tile mosaic.</title>
+<title id="t">Saleh, full-stack developer and AI engineer in Isfahan. The name is set in girih tile mosaic.</title>
 <defs>
-<style>
-:root{{--ink:{T['ink']}}}
-{css}
-</style>
 {''.join(grads)}
-<g id="mb" stroke="{T['edge']}" stroke-opacity=".62" stroke-width=".75" stroke-linejoin="round">{''.join(mosaic_block)}</g>
+<g id="mb" stroke="{T['edge']}" stroke-opacity=".62" stroke-width="{sw:g}" stroke-linejoin="round">{''.join(mosaic_block)}</g>
 <path id="wb" d="{wall_d}" fill="none" stroke="{T['ink']}" stroke-opacity="{T['lines']}" stroke-width=".9" stroke-linecap="round"/>
-<path id="nm" pathLength="1" d="{en_d}"/>
+<path id="nm" d="{en_d}"/>
 <clipPath id="names"><use href="#nm" xlink:href="#nm"/></clipPath>
-<linearGradient id="feather" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".625" stop-color="#fff"/><stop offset=".875" stop-color="#000"/><stop offset="1" stop-color="#000"/></linearGradient>
-<mask id="reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="{W}" height="{H}"><rect class="rv" x="0" y="0" width="3200" height="{H}" fill="url(#feather)"/></mask>
 </defs>
 <rect width="{W}" height="{H}" fill="{T['bg']}"/>
-<g class="wall">{wall_uses}</g>
-<g clip-path="url(#names)"><g mask="url(#reveal)">{mosaic_uses}</g></g>
-<use class="o" href="#nm" xlink:href="#nm"/>
-<g>{glaze}</g>
-<g class="meta" fill="{T['ink2']}">
+<g>{wall_uses}</g>
+<g clip-path="url(#names)">{mosaic_uses}</g>
+<use href="#nm" xlink:href="#nm" fill="none" stroke="{T['ink']}" stroke-width="{ring}" stroke-linejoin="round"/>
+<g fill="{T['ink2']}">
 <g transform="translate({MARGIN} 46)"><path d="{star_d}" fill="none" stroke="{T['accent']}" stroke-width="1.9" stroke-linejoin="round"/></g>
 <path d="{meta_l}"/><path d="{meta_r}"/>
 </g>
-<g class="meta" fill="{T['ink']}"><path d="{tag1}"/></g>
-<g class="meta" fill="{T['ink2']}"><path d="{tag2}"/></g>
+<g fill="{T['ink']}"><path d="{tag1}"/></g>
+<g fill="{T['ink2']}"><path d="{tag2}"/></g>
 </svg>
 '''
     Path(out).write_text(svg)
-    print(out, f'{len(svg) / 1024:.0f} KB', 'patches', n_patch, 'L', L)
+    print(out, f'{len(svg) / 1024:.0f} KB', 'size', round(en_size), 'L', L, 'height', H)
 
 
 if __name__ == '__main__':
-    # The SVG is the source of the README banner. It is not shown directly: banner-frames.mjs
-    # photographs one loop of it and banner_webp.py packs that into assets/hero-*.webp.
-    out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'scripts' / 'build'
+    out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'assets'
+    tile = float(sys.argv[2]) if len(sys.argv) > 2 else TILE
     out.mkdir(parents=True, exist_ok=True)
-    build('light', out / 'hero-light.svg')
-    build('dark', out / 'hero-dark.svg')
+    build('light', out / 'hero-light.svg', tile)
+    build('dark', out / 'hero-dark.svg', tile)

@@ -18,10 +18,10 @@
 </head>
 <body>
 <section class="hero card" id="card" data-hero>
-  <canvas class="hero__wall" aria-hidden="true"></canvas>
+  <div class="hero__wall" aria-hidden="true"></div>
   <div class="hero__in">
     <div class="hero__meta mono"><span class="hero__place"><i class="dot" style="animation:none"></i>Isfahan, Iran</span><span>2026</span></div>
-    <h1 class="hero__name" data-name-slot>Mohammad Saleh Mahdinejad</h1>
+    <h1 class="hero__name" data-name-slot>Saleh</h1>
   </div>
   <div class="tag">
     <p>Full-stack developer and AI engineer. I&nbsp;build agents that <em>cite their sources</em>.</p>
@@ -31,7 +31,7 @@
 <script type="module">
   import { createHero } from '/docs/assets/js/hero.js';
   const root = document.getElementById('card');
-  window.__hero = createHero({ root, canvas: root.querySelector('canvas'), nameSlot: root.querySelector('[data-name-slot]'), getTheme: () => 'light' });
+  window.__hero = createHero({ root, wall: root.querySelector('.hero__wall'), nameSlot: root.querySelector('[data-name-slot]'), getTheme: () => 'light', viewHeight: () => 1000 });   // the card is a fixed size; the name should fill its width
 </script>
 </body>
 </html>

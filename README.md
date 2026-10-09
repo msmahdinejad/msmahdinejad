@@ -1,15 +1,15 @@
 <p align="center">
   <a href="https://msmahdinejad.github.io/msmahdinejad/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/msmahdinejad/msmahdinejad/main/assets/hero-dark.webp">
-      <img src="https://raw.githubusercontent.com/msmahdinejad/msmahdinejad/main/assets/hero-light.webp" alt="Mohammad Saleh Mahdinejad, full-stack developer and AI engineer in Isfahan, with the name set in girih tile mosaic." width="100%">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/msmahdinejad/msmahdinejad/main/assets/hero-dark.svg">
+      <img src="https://raw.githubusercontent.com/msmahdinejad/msmahdinejad/main/assets/hero-light.svg" alt="Saleh, full-stack developer and AI engineer in Isfahan, with the name set in girih tile mosaic." width="100%">
     </picture>
   </a>
 </p>
 
 **I build agents that cite their sources, ask before they act, and survive a restart.**
 
-I'm Mohammad Saleh, a full-stack developer and computer engineering student at the University of Isfahan. Most of what I build has a model somewhere inside it, but the part that decides whether it holds up is everything around the model: retrieval that finds the right page, a queue that survives a crash, a confirmation step before anything irreversible.
+I'm Saleh (Mohammad Saleh Mahdinejad on paper), a full-stack developer and computer engineering student at the University of Isfahan. Most of what I build has a model somewhere inside it, but the part that decides whether it holds up is everything around the model: retrieval that finds the right page, a queue that survives a crash, a confirmation step before anything irreversible.
 
 I work in Persian and English, and so do the tools I make.
 

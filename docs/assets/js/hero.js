@@ -18,13 +18,12 @@
 
 import { unitCell } from './girih.js';
 
-// Each line has its own scale: the given name sits small above a full-width surname.
+// One word, as wide as the column allows (and no taller than about half the screen).
 const NAME = {
-  wide: [{ t: 'Mohammad Saleh', k: 0.5 }, { t: 'Mahdinejad', k: 1 }],
-  compact: [{ t: 'Mohammad', k: 0.6 }, { t: 'Saleh', k: 0.6 }, { t: 'Mahdi', k: 1 }, { t: 'nejad', k: 1 }],
+  text: 'Saleh',
   font: (s) => `800 ${s}px FrauncesHero, Georgia, serif`,
-  lh: 0.86,
-  maxSize: 400,
+  maxSize: 700,
+  tile: 0.042,          // girih cell size, as a fraction of the lettering size
 };
 
 export const PAL = {
@@ -55,7 +54,7 @@ function makeCanvas(w, h) {
   return c;
 }
 
-export function createHero({ root, wall, nameSlot, getTheme }) {
+export function createHero({ root, wall, nameSlot, getTheme, viewHeight = () => window.innerHeight }) {
   const reduceQuery = matchMedia('(prefers-reduced-motion: reduce)');
   const lite = document.documentElement.classList.contains('lite');   // save-data or a very small device
   const probe = makeCanvas(8, 8).getContext('2d');
@@ -96,27 +95,36 @@ export function createHero({ root, wall, nameSlot, getTheme }) {
   // `left`/`width` are the content column the name has to sit in, measured from the hero's left edge.
   function layout({ left, width, W, vh }) {
     const compact = width < 600 || W / vh < 0.9;
-    const lines = compact ? NAME.compact : NAME.wide;
+    const lines = [{ t: NAME.text, k: 1 }];
+    // the block (space above and below the letters included) grows in step with the size
+    const block = (size) => {
+      probe.font = NAME.font(size);
+      const m = probe.measureText(NAME.text);
+      const base = m.actualBoundingBoxAscent + size * 0.04;
+      return { m, base, block: base + Math.max(m.actualBoundingBoxDescent, size * 0.05) + size * 0.06 };
+    };
     probe.font = NAME.font(100);
-    const per100 = lines.map((l) => probe.measureText(l.t).width * l.k);
-    let size = width / (Math.max(...per100) / 100);
+    let size = width / (probe.measureText(NAME.text).width / 100);
     size = Math.min(size, NAME.maxSize);
-    const tall = lines.reduce((h, l) => h + l.k * NAME.lh, 0) + 0.3;
-    size = Math.min(size, clamp(vh * 0.62, 240, 900) / tall);   // keep it from eating the whole screen
-    const metrics = lines.map((l) => { probe.font = NAME.font(size * l.k); return probe.measureText(l.t); });
-    const baselines = [metrics[0].actualBoundingBoxAscent + size * 0.04];
-    for (let i = 1; i < lines.length; i++) baselines.push(baselines[i - 1] + size * lines[i].k * NAME.lh + size * 0.02);
-    const desc = Math.max(metrics[metrics.length - 1].actualBoundingBoxDescent, size * 0.05);
-    const block = baselines[baselines.length - 1] + desc + size * 0.06;
-    return { lines, size, x: left, baselines, block, compact };
+    size = Math.min(size, clamp(vh * 0.54, 220, 820) / (block(100).block / 100));   // keep it from eating the whole screen
+    const { base, block: height } = block(size);
+    return { lines, size, x: left, baselines: [base], block: height, compact };
   }
 
-  function drawText(g, lay, dy, fill) {
+  // Draws the name. With `edge` set, the letters also get an outline that wide (round joins).
+  function drawText(g, lay, dy, fill, edge = 0) {
     g.save();
     g.textBaseline = 'alphabetic';
     g.textAlign = 'left';
     g.fillStyle = fill;
-    lay.lines.forEach((l, i) => { g.font = NAME.font(lay.size * l.k); g.fillText(l.t, lay.x, lay.baselines[i] + dy); });
+    g.strokeStyle = fill;
+    g.lineWidth = edge;
+    g.lineJoin = 'round';
+    lay.lines.forEach((l, i) => {
+      g.font = NAME.font(lay.size * l.k);
+      if (edge) g.strokeText(l.t, lay.x, lay.baselines[i] + dy);
+      g.fillText(l.t, lay.x, lay.baselines[i] + dy);
+    });
     g.restore();
   }
 
@@ -142,7 +150,7 @@ export function createHero({ root, wall, nameSlot, getTheme }) {
     let rect = root.getBoundingClientRect();
     const W = Math.round(rect.width);
     const col = nameSlot.getBoundingClientRect();
-    const lay = layout({ left: col.left - rect.left, width: col.width, W, vh: window.innerHeight });
+    const lay = layout({ left: col.left - rect.left, width: col.width, W, vh: viewHeight() });
     nameSlot.style.height = Math.ceil(lay.block) + 'px';
     rect = root.getBoundingClientRect();
     const H = Math.round(rect.height);
@@ -155,7 +163,7 @@ export function createHero({ root, wall, nameSlot, getTheme }) {
     const place = (el, w, h, y) => { el.style.width = w + 'px'; el.style.height = h + 'px'; el.style.top = y + 'px'; el.style.left = '0'; };
     cName.width = Math.round(box.w * px); cName.height = Math.round(box.h * px);
 
-    const L = clamp(Math.round(lay.size * 0.075), 10, 26);
+    const L = clamp(Math.round(lay.size * NAME.tile), 10, 30);
     const U = unitCell(L, 64);
     const cols = Math.ceil(W / L) + 3, rows = Math.ceil(H / L) + 3;
     const total = cols * rows * U.n;
@@ -278,40 +286,26 @@ export function createHero({ root, wall, nameSlot, getTheme }) {
     return { canvas: c, k };
   }
 
+  // Everything on one canvas: the mosaic across the box, cut to the letters, then the ink edge
+  // painted behind it.
   function renderInlay() {
     const { box, pal, px, lay, top } = S;
     const w = cName.width, h = cName.height;
-    // letters, at full resolution
-    const mask = makeCanvas(w, h);
-    const mg = mask.getContext('2d');
-    mg.scale(px, px);
-    drawText(mg, lay, top - box.y, '#000');
-    // the ink edge: the letter shape, nudged around a small circle
-    const ink = makeCanvas(w, h);
-    const ig = ink.getContext('2d');
-    ig.drawImage(mask, 0, 0);
-    ig.globalCompositeOperation = 'source-in';
-    ig.fillStyle = css(pal.ink, 0.92);
-    ig.fillRect(0, 0, w, h);
+    const { canvas: block, k } = mosaicBlock();
     gName.setTransform(1, 0, 0, 1, 0, 0);
     gName.globalCompositeOperation = 'source-over';
     gName.clearRect(0, 0, w, h);
-    const r = Math.max(1.3, lay.size * 0.0055) * px;
-    for (let a = 0; a < 12; a++) {
-      const t = (a / 12) * Math.PI * 2;
-      gName.drawImage(ink, Math.cos(t) * r, Math.sin(t) * r);
-    }
-    // the mosaic, clipped to the letters
-    const { canvas: block, k } = mosaicBlock();
-    const mo = makeCanvas(w, h);
-    const og = mo.getContext('2d');
-    const pat = og.createPattern(block, 'repeat');
+    const pat = gName.createPattern(block, 'repeat');
     pat.setTransform(new DOMMatrix().translate(0, -box.y * px).scale(px / k));   // keep it on the wall's grid
-    og.fillStyle = pat;
-    og.fillRect(0, 0, w, h);
-    og.globalCompositeOperation = 'destination-in';
-    og.drawImage(mask, 0, 0);
-    gName.drawImage(mo, 0, 0);
+    gName.fillStyle = pat;
+    gName.fillRect(0, 0, w, h);
+    gName.setTransform(px, 0, 0, px, 0, 0);
+    gName.globalCompositeOperation = 'destination-in';
+    drawText(gName, lay, top - box.y, '#000');
+    gName.globalCompositeOperation = 'destination-over';
+    drawText(gName, lay, top - box.y, css(pal.ink, 0.95), 2 * Math.max(1.3, lay.size * 0.0055));
+    gName.globalCompositeOperation = 'source-over';
+    gName.setTransform(1, 0, 0, 1, 0, 0);
   }
 
   // ---------------------------------------------------------------- glaze
@@ -447,7 +441,7 @@ export function createHero({ root, wall, nameSlot, getTheme }) {
 
   async function init() {
     await Promise.race([
-      document.fonts.load('800 100px FrauncesHero', 'Mohammad Saleh Mahdinejad'),
+      document.fonts.load('800 100px FrauncesHero', NAME.text),
       new Promise((r) => setTimeout(r, 2500)),
     ]);
     if (destroyed) return;
