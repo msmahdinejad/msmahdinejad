@@ -25,10 +25,10 @@ I work in Persian and English, and so do the tools I make.
 <table>
   <tr>
     <td width="50%" valign="top">
-      <a href="https://github.com/msmahdinejad/cinewright"><img src="assets/plate-cinewright.webp" alt="A looping showreel rendered entirely from code: poster-style type, 3D shapes, particles and girih patterns" width="100%"></a>
+      <a href="https://github.com/msmahdinejad/cinewright"><img src="assets/plate-cinewright.webp" alt="The Cinewright ident, rendered entirely from code: a window of code shatters into particles, becomes the mark, a helix of film frames, then the name" width="100%"></a>
       <h3><a href="https://github.com/msmahdinejad/cinewright">Cinewright</a></h3>
-      <p><em>Teaches coding agents to make cinema-grade video, entirely from code.</em></p>
-      <p>An agent skill for Codex, Claude Code and friends: 239 techniques, 32 transitions, a from-scratch 3D renderer and a sound engine. Every frame is a pure function of time, so an agent can render one, look at it, fix a number and try again.</p>
+      <p><em>Your coding agent can now direct films.</em></p>
+      <p>An agent skill for Codex, Claude Code and friends: a motion-graphics kit that cuts a film into one-idea shots, 256 techniques, 32 transitions, a from-scratch 3D renderer and a sound engine. Every frame is a pure function of time, so an agent can render one, look at it, fix a number and try again. Benchmarked against itself, with and without the skill.</p>
       <p><sub><code>JavaScript</code> <code>WebGL</code> <code>Node.js</code> <code>FFmpeg</code></sub></p>
       <p><a href="https://msmahdinejad.github.io/cinewright/">Website</a> · <a href="https://github.com/msmahdinejad/cinewright">GitHub</a></p>
     </td>
@@ -36,9 +36,9 @@ I work in Persian and English, and so do the tools I make.
       <a href="https://github.com/msmahdinejad/avorythm"><img src="assets/plate-avorythm.webp" alt="Avorythm playing a video with live dubbing, dual subtitles and a target-language picker" width="100%"></a>
       <h3><a href="https://github.com/msmahdinejad/avorythm">Avorythm</a></h3>
       <p><em>Hear every voice, or just read it, in your language.</em></p>
-      <p>Live translation and dubbing for desktop and browser audio. A Chrome and Edge extension and a desktop app for Windows, macOS and Linux, with original audio, dub, source subtitles and translated subtitles as four independent outputs. No telemetry.</p>
+      <p>Live translation and dubbing for desktop and browser audio. A Chrome and Edge extension and a desktop app for Windows, macOS and Linux, with original audio, dub, source subtitles and translated subtitles as four independent outputs, in more than thirty target languages. No telemetry.</p>
       <p><sub><code>Python</code> <code>JavaScript</code> <code>Gemini</code> <code>Groq Whisper</code> <code>FFmpeg</code> <code>Chrome MV3</code></sub></p>
-      <p><a href="https://chromewebstore.google.com/detail/avorythm-live-translation/kbdbbedijheicmmnmoidamdaodjbhjje">Chrome Web Store</a> · <a href="https://github.com/msmahdinejad/avorythm">GitHub</a> · <a href="https://github.com/msmahdinejad/avorythm/releases">Releases</a></p>
+      <p><a href="https://msmahdinejad.github.io/avorythm/">Website</a> · <a href="https://chromewebstore.google.com/detail/avorythm-live-translation/kbdbbedijheicmmnmoidamdaodjbhjje">Chrome Web Store</a> · <a href="https://github.com/msmahdinejad/avorythm">GitHub</a> · <a href="https://github.com/msmahdinejad/avorythm/releases">Releases</a></p>
     </td>
   </tr>
 </table>
@@ -68,17 +68,11 @@ I work in Persian and English, and so do the tools I make.
 
 <table>
   <tr>
-    <td width="50%" valign="top">
-      <h3><a href="https://asan-bimeh.ir">AsanBimeh</a></h3>
+    <td width="100%" valign="top">
+      <h3><a href="https://bime-sanj.ir">Bimeh Sanj</a></h3>
       <p><em>A Persian insurance comparison and decision platform.</em></p>
       <p>Quotes from several sources side by side, with recommendations that explain themselves. An assistant that works through controlled tools, by text or by voice. Installment analysis.</p>
       <p><sub><code>React</code> <code>Node.js</code> <code>PostgreSQL</code> <code>Redis</code> <code>BullMQ</code> <code>Playwright</code> <code>Docker</code></sub></p>
-    </td>
-    <td width="50%" valign="top">
-      <h3><a href="https://trexchat.ir">TREX AI</a></h3>
-      <p><em>A Persian workspace for talking to many AI models.</em></p>
-      <p>Real-time streaming, AI personas, file workflows and conversation management, plus credits, payments and referrals, with the heavy work in background queues.</p>
-      <p><sub><code>Django</code> <code>DRF</code> <code>Channels</code> <code>Celery</code> <code>React</code> <code>Redis</code> <code>Docker</code> <code>Nginx</code></sub></p>
     </td>
   </tr>
 </table>

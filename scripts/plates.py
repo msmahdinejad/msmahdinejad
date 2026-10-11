@@ -25,9 +25,9 @@ def still(name, quality=84):
     print(dest.name, f'{dest.stat().st_size / 1024:.0f} KB')
 
 
-def animated(name, quality=60, start=0, end=49, width=640):
-    """The first scenes of the showreel ("I make things move"): flat colours, so they compress
-    well, and every frame is kept so the motion stays smooth."""
+def animated(name, quality=44, start=0, end=49, width=640):
+    """A few seconds of the Cinewright ident (the helix of film frames, then the name), every frame
+    kept so the motion stays smooth."""
     folder = TMP / f'{name}-frames'
     files = sorted(folder.glob('*.png'))[start:end]
     size = (width, round(width * H / W))

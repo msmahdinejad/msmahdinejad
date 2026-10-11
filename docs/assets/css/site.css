@@ -333,6 +333,15 @@ html.js [data-reveal]:not(.in) { animation: unhide 0.5s ease 3.5s forwards; }
 .site__title { font-family: var(--display); font-size: clamp(40px, 4.6vw, 68px); font-weight: 600; line-height: 1; letter-spacing: -0.025em; font-variation-settings: "opsz" 144; }
 .site__tag { font-family: var(--display); font-style: italic; font-size: clamp(19px, 1.8vw, 24px); color: var(--ink-2); margin: 12px 0 20px; line-height: 1.3; }
 .site .tags { margin-top: auto; padding-top: 14px; margin-bottom: 0; }
+/* one product: the card runs full width, the name and tag on the left, the points on the right */
+.prod__grid--one { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 861px) {
+  .prod__grid--one .site { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); column-gap: clamp(32px, 6vw, 96px); align-items: start; }
+  .prod__grid--one .site__top { grid-column: 1 / -1; }
+  .prod__grid--one .site__title, .prod__grid--one .site__tag, .prod__grid--one .tags { grid-column: 1; }
+  .prod__grid--one .site__points { grid-column: 2; grid-row: 2 / span 3; align-self: end; margin: 0; }
+  .prod__grid--one .site .tags { margin-top: 8px; }
+}
 @media (max-width: 860px) { .prod__grid { grid-template-columns: 1fr; } }
 
 /* ------------------------------------------------------------------ approach */
