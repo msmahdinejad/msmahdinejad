@@ -24,6 +24,19 @@ I work in Persian and English, and so do the tools I make.
 
 <table>
   <tr>
+    <td width="100%" valign="top">
+      <a href="https://msmahdinejad.github.io/iran-bourse-mcp/#film"><img src="assets/plate-iran-bourse-mcp.webp" alt="Tool cards from the Iran Bourse MCP launch film: options, index history, capital increases and fund rankings, each answered by a real tool call" width="100%"></a>
+      <h3><a href="https://github.com/msmahdinejad/iran-bourse-mcp">Iran Bourse MCP</a> <sub><code>new</code></sub></h3>
+      <p><em>Your AI agent, on the Tehran Stock Exchange.</em></p>
+      <p>Ask an AI for today's buy queues on the Tehran exchange and it tells you it has no access. This MCP server fixes that: 40 read-only tools that hand any agent quotes, the order book, tick-by-tick trades, real vs legal money flow, shareholders, options, indices, funds and Codal filings, cleaned and labelled. A stock screener with its own filter language lets the agent write the condition and get back only the stocks that pass. In a small, single-model benchmark a market-wide screen took one call and 723 tokens instead of 22 requests and 7.4 million. Installs on 17 AI clients with one command, no login, no keys.</p>
+      <p><sub><code>Python</code> <code>MCP</code> <code>httpx</code> <code>Pytest</code> <code>Docker</code></sub></p>
+      <p><a href="https://msmahdinejad.github.io/iran-bourse-mcp/">Website</a> · <a href="https://msmahdinejad.github.io/iran-bourse-mcp/#film">2-minute film</a> · <a href="https://github.com/msmahdinejad/iran-bourse-mcp">GitHub</a> · <a href="https://github.com/msmahdinejad/iran-bourse-mcp/releases">Releases</a></p>
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
     <td width="50%" valign="top">
       <a href="https://github.com/msmahdinejad/cinewright"><img src="assets/plate-cinewright.webp" alt="The Cinewright ident, rendered entirely from code: a window of code shatters into particles, becomes the mark, a helix of film frames, then the name" width="100%"></a>
       <h3><a href="https://github.com/msmahdinejad/cinewright">Cinewright</a></h3>

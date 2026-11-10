@@ -261,6 +261,7 @@ function commands() {
     { g: 'go', en: 'Also built', run: go('#more') },
     { g: 'go', en: 'GitHub, live', run: go('#github') },
     { g: 'go', en: 'Contact', run: go('#contact') },
+    { g: 'work', en: 'Iran Bourse MCP', hint: 'Website', run: ext('https://msmahdinejad.github.io/iran-bourse-mcp/') },
     { g: 'work', en: 'Cinewright', hint: 'GitHub', run: ext('https://github.com/msmahdinejad/cinewright') },
     { g: 'work', en: 'Avorythm', hint: 'GitHub', run: ext('https://github.com/msmahdinejad/avorythm') },
     { g: 'work', en: 'SourceLens', hint: 'GitHub', run: ext('https://github.com/msmahdinejad/SourceLens') },
